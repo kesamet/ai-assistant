@@ -1,14 +1,14 @@
 import os
-from typing import Union
+import requests
+from typing import Any, Union
 
 import streamlit as st
 from dotenv import load_dotenv
 from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI, ChatGooglePalm
-from langchain.llms import CTransformers
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 
-from src.llama2 import build_llama2, llama2_prompt
+from src.llama2 import llama2_prompt
 
 st.set_page_config(page_title="Personal Assistant")
 
@@ -16,12 +16,15 @@ _ = load_dotenv("../code-conversion/.env")
 os.environ["GOOGLE_API_KEY"] = os.environ["PALM_API_KEY"]
 
 
-@st.cache_resource
-def _load_llama2():
-    return build_llama2()
+class Llama2:
+    def __init__(self) -> None:
+        self._api_url = "http://127.0.0.1:8000"
 
-
-LLM_LLAMA2 = _load_llama2()
+    def __call__(self, messages, *args: Any, **kwds: Any) -> dict:
+        payload = {"inputs": llama2_prompt(messages)}
+        headers = {"Content-Type": "application/json"}
+        response = requests.post(self._api_url, headers=headers, json=payload)
+        return response.json()
 
 
 def init_messages() -> None:
@@ -35,7 +38,7 @@ def init_messages() -> None:
         st.session_state.costs = []
 
 
-def select_llm() -> Union[ChatGooglePalm, ChatOpenAI, CTransformers]:
+def select_llm() -> Union[ChatGooglePalm, ChatOpenAI, Llama2]:
     model_name = st.sidebar.radio(
         "Choose LLM",
         ["llama-2-7b-chat-ggml", "googlepalm", "gpt-4", "gpt-3.5-turbo-0613"],
@@ -46,7 +49,7 @@ def select_llm() -> Union[ChatGooglePalm, ChatOpenAI, CTransformers]:
     elif model_name.startswith("gpt-"):
         return ChatOpenAI(temperature=temperature, model_name=model_name)
     elif model_name == "llama-2-7b-chat-ggml":
-        return LLM_LLAMA2
+        return Llama2()
 
 
 def get_response(llm, messages) -> tuple[str, float]:
@@ -65,8 +68,12 @@ def get_response(llm, messages) -> tuple[str, float]:
         except Exception:
             return "ChatGPT is not available", 0.0
 
-    if isinstance(llm, CTransformers):
-        return llm(llama2_prompt(messages)), 0.0
+    if isinstance(llm, Llama2):
+        try:
+            answer = llm(messages)
+            return answer["content"], 0.0
+        except Exception:
+            return "Llama2 is not available", 0.0
 
 
 def main():
