@@ -5,15 +5,17 @@ from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 
+from src import CFG
 
-def build_llama2() -> CTransformers:
-    model = "../retrieval-augmented-generation/models/llama-2-7b-chat-ggml/llama-2-7b-chat.ggmlv3.q2_K.bin"
+
+def load_llama2() -> CTransformers:
+    """Load Llama-2 model."""
     return CTransformers(
-        model=model,
-        model_type="llama",
+        model=CFG.MODEL,
+        model_type=CFG.MODEL_TYPE,
         config={
-            "max_new_tokens": 512,
-            "temperature": 0.01,
+            "max_new_tokens": CFG.MAX_NEW_TOKENS,
+            "temperature": CFG.TEMPERATURE,
         },
         callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
         verbose=False,
@@ -21,9 +23,7 @@ def build_llama2() -> CTransformers:
 
 
 def llama2_prompt(messages: List[Union[SystemMessage, HumanMessage, AIMessage]]) -> str:
-    """
-    Convert the messages to Llama2 compliant format.
-    """
+    """Convert the messages to Llama2 compliant format."""
     messages = convert_langchainschema_to_dict(messages)
 
     B_INST = "[INST]"
@@ -74,9 +74,7 @@ def convert_langchainschema_to_dict(
 
 
 def find_role(message: Union[SystemMessage, HumanMessage, AIMessage]) -> str:
-    """
-    Identify role name from langchain.schema object.
-    """
+    """Identify role name from langchain.schema object."""
     if isinstance(message, SystemMessage):
         return "system"
     if isinstance(message, HumanMessage):

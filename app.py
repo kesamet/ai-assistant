@@ -1,24 +1,20 @@
-import os
 import requests
 from typing import Any, Union
 
 import streamlit as st
-from dotenv import load_dotenv
 from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI, ChatGooglePalm
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 
+from src import CFG
 from src.llama2 import llama2_prompt
 
 st.set_page_config(page_title="Personal Assistant")
 
-_ = load_dotenv("../code-conversion/.env")
-os.environ["GOOGLE_API_KEY"] = os.environ["PALM_API_KEY"]
-
 
 class Llama2:
     def __init__(self) -> None:
-        self._api_url = "http://127.0.0.1:8000"
+        self._api_url = f"http://{CFG.HOST}:{CFG.PORT}"
 
     def __call__(self, messages, *args: Any, **kwds: Any) -> dict:
         payload = {"inputs": llama2_prompt(messages)}
@@ -52,7 +48,7 @@ def select_llm() -> Union[ChatGooglePalm, ChatOpenAI, Llama2]:
         return Llama2()
 
 
-def get_response(llm, messages) -> tuple[str, float]:
+def get_answer(llm, messages) -> tuple[str, float]:
     if isinstance(llm, ChatGooglePalm):
         try:
             answer = llm(messages)
@@ -87,7 +83,7 @@ def main():
     if user_input := st.chat_input("Your input"):
         st.session_state.messages.append(HumanMessage(content=user_input))
         with st.spinner("AI is responding ..."):
-            answer, cost = get_response(llm, st.session_state.messages)
+            answer, cost = get_answer(llm, st.session_state.messages)
         st.session_state.messages.append(AIMessage(content=answer))
         st.session_state.costs.append(cost)
 
