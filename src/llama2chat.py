@@ -1,3 +1,4 @@
+import logging
 from typing import List, Union
 
 from langchain.llms import CTransformers
@@ -7,11 +8,14 @@ from langchain.schema import SystemMessage, HumanMessage, AIMessage
 
 from src import CFG
 
+logging.basicConfig(level=logging.INFO)
 
-def load_llama2() -> CTransformers:
-    """Load Llama-2 model."""
-    return CTransformers(
-        model=CFG.MODEL,
+
+def load_llama2chat() -> CTransformers:
+    """Load Llama-2-chat model."""
+    logging.info(f"Loading llama2chat model ...")
+    model = CTransformers(
+        model=CFG.MODEL_LLAMA2CHAT,
         model_type=CFG.MODEL_TYPE,
         config={
             "max_new_tokens": CFG.MAX_NEW_TOKENS,
@@ -20,6 +24,8 @@ def load_llama2() -> CTransformers:
         callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
         verbose=False,
     )
+    logging.info("Model loaded")
+    return model
 
 
 def llama2_prompt(messages: List[Union[SystemMessage, HumanMessage, AIMessage]]) -> str:
