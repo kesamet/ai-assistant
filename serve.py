@@ -28,12 +28,11 @@ if __name__ == "__main__":
     parser.add_argument("-model", "--model", type=str)
     args = parser.parse_args()
 
-    host = CFG.HOST
     if args.model == "llama2chat":
         LLM = load_llama2chat()
-        uvicorn.run(app, host=host, port=8000)
+        uvicorn.run(app, host=CFG.HOST, port=CFG.PORT_LLAMA2CHAT)
     elif args.model == "codellama":
         LLM = load_codellama()
-        uvicorn.run(app, host=host, port=8001)
+        uvicorn.run(app, host=CFG.HOST, port=CFG.PORT_CODELLAMA)
     else:
         raise NotImplementedError

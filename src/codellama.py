@@ -18,6 +18,8 @@ def load_codellama() -> CTransformers:
         config={
             "max_new_tokens": CFG.MAX_NEW_TOKENS,
             "temperature": CFG.TEMPERATURE,
+            "repetition_penalty": CFG.REPETITION_PENALTY,
+            "context_length": CFG.CONTEXT_LENGTH,
         },
         callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
         verbose=False,
@@ -37,8 +39,8 @@ def get_prompt(query: str) -> str:
         str: The prompt.
     """
     template = """[INST] Write code to solve the following coding problem that obeys \
-the constraints and passes the example test cases. Please wrap your code \
-answer using ```:
+the constraints and passes the example test cases. Please wrap your code answer \
+using ```:
 {query}
 [/INST]"""
     return template.format(query=query)

@@ -1,60 +1,40 @@
-from typing import Any, Optional, Type
+from typing import Optional, Type
 
 from pydantic import BaseModel, Field
-from langchain import LLMChain, PromptTemplate
 from langchain.callbacks.manager import (
     AsyncCallbackManagerForToolRun,
     CallbackManagerForToolRun,
 )
-from langchain.chains import RetrievalQA
-from langchain.chains.llm_math.prompt import PROMPT
-from langchain.tools import BaseTool, Tool
-from langchain.utilities import WikipediaAPIWrapper, SerpAPIWrapper
-from langchain.llms import GooglePalm
-from langchain.chat_models import ChatGooglePalm
+from langchain.chains import llm_math
+from langchain.llms.google_palm import GooglePalm
+from langchain.schema import StrOutputParser
+from langchain.tools import BaseTool, Tool, WikipediaQueryRun
+from langchain.utilities.wikipedia import WikipediaAPIWrapper
+from langchain.utilities.serpapi import SerpAPIWrapper
 
+output_parser = StrOutputParser()
 llm = GooglePalm(temperature=0.0)
-# llm = ChatGooglePalm(temperature=0.0)
-
-search = SerpAPIWrapper()
-wikipedia = WikipediaAPIWrapper()
 
 # Wikipedia Tool
-wikipedia_tool = Tool(
-    name="Wikipedia",
-    func=wikipedia.run,
-    description="A useful tool for searching the Internet to find information on world events, \
-        issues, etc. Worth using for general topics. Use precise questions.",
-)
+_wikipedia = WikipediaAPIWrapper()
+wikipedia_tool = WikipediaQueryRun(api_wrapper=_wikipedia)
+# wikipedia_tool = Tool(
+#     name="Wikipedia",
+#     func=wikipedia.run,
+#     description="A useful tool for searching wikipedia to find information.",
+# )
 
 # Web Search Tool
+_search = SerpAPIWrapper()
 search_tool = Tool(
     name="Web Search",
-    func=search.run,
+    func=_search.run,
     description="A useful tool for searching the Internet to find information on world events, \
         issues, etc. Worth using for general topics. Use precise questions.",
 )
 
-
-class CustomSearchTool(BaseTool):
-    name = "custom_search"
-    description = "useful for when you need to answer questions about current events"
-
-    def _run(
-        self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
-    ) -> str:
-        """Use the tool."""
-        return search.run(query)
-
-    async def _arun(
-        self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
-    ) -> str:
-        """Use the tool asynchronously."""
-        raise NotImplementedError("custom_search does not support async")
-
-
 # Calculator Tool
-llm_math = LLMChain(llm=llm, prompt=PROMPT)
+_MATH_CHAIN = llm_math.prompt.PROMPT | llm | output_parser
 
 
 class CalculatorInput(BaseModel):
@@ -63,75 +43,20 @@ class CalculatorInput(BaseModel):
 
 class CustomCalculatorTool(BaseTool):
     name = "Calculator"
-    description = "useful for when you need to answer questions about math"
+    description = "A useful tool for answering questions about math"
     args_schema: Type[BaseModel] = CalculatorInput
 
     def _run(
         self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
-        return llm_math.run(query)
+        return _MATH_CHAIN.invoke({"question": query})
 
     async def _arun(
         self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool asynchronously."""
-        raise NotImplementedError("Calculator does not support async")
+        raise _MATH_CHAIN.ainvoke({"question": query})
 
 
-# vectordb = ...
-
-
-# # Custom Retrieval QA Tool
-# QA_TEMPLATE = """Use the following pieces of information to answer the user's question. \
-# If you don't know the answer, just say that you don't know, don't try to make up an answer.
-
-# Context: {context}
-# Question: {question}
-
-# Only return the helpful answer below and nothing else.
-# Helpful answer:
-# """
-
-# prompt = PromptTemplate(
-#     template=QA_TEMPLATE,
-#     input_variables=["context", "question"],
-# )
-
-# qa = RetrievalQA.from_chain_type(
-#     llm=llm,
-#     chain_type="stuff",
-#     retriever=vectordb.as_retriever(search_kwargs={"k": 2}),
-#     return_source_documents=False,
-#     chain_type_kwargs={"prompt": prompt},
-#     verbose=True,
-# )
-
-
-# class CustomRetrievalTool(BaseTool):
-#     retriever: Any
-#     return_direct = True
-
-#     def _run(
-#         self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
-#     ) -> str:
-#         """Use the tool."""
-#         result = self.retriever({"query": query})
-#         answer = result["result"]
-#         # Convert the list of source_documents to a string.
-#         sources = str(result["source_documents"])
-#         # Concatenate the answer and the sources into a single string.
-#         return f"Answer: {answer}\nSources:\n{sources}"
-
-#     async def _arun(
-#         self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
-#     ) -> str:
-#         """Use the tool asynchronously."""
-#         raise NotImplementedError("CustomRetrieval does not support async")
-
-
-# custom_qa_tool = CustomRetrievalTool(
-#     name="Information Extractor",
-#     description="This tool is capable of extracting factual data related to a provided query.",
-#     retriever=qa,
-# )
+calculator_tool = CustomCalculatorTool()
