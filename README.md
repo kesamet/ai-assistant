@@ -16,21 +16,16 @@ Activate the environment.
 conda activate assistant
 ```
 
-Download the LLM artefact. The model used in this demo is downloaded from [TheBloke](https://huggingface.co/TheBloke).
-```bash
-wget https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGML/blob/main/llama-2-7b-chat.ggmlv3.q2_K.bin -P ./models
-```
-```bash
-wget https://huggingface.co/TheBloke/CodeLlama-7B-GGUF/blob/main/codellama-7b.Q2_K.gguf -P ./models
-```
+Download the LLM artefact. The models used in this demo are downloaded from [TheBloke](https://huggingface.co/TheBloke).
+- [Llama-2-7B-Chat-GGML](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGML/tree/main)
+- [CodeLlama-7B-GGUF](https://huggingface.co/TheBloke/CodeLlama-7B-GGUF/tree/main)
 
 You can also use another model of your choice. Ensure that it can be loaded by `langchain.llms.CTransformers` and update `config.yaml`.
 
 
 ## 💻 App
 
-We use Streamlit as the interface for the demos. There are two demos:
-- Retrieval QA
+We use Streamlit as the interface for the demos:
 ```bash
 streamlit run app.py
 ```
