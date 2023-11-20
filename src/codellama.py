@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 
 def load_codellama() -> CTransformers:
     """Load codellama model."""
-    logging.info(f"Loading codellama model ...")
+    logging.info("Loading codellama model ...")
     model = CTransformers(
         model=CFG.MODEL_CODELLAMA,
         model_type=CFG.MODEL_TYPE,
