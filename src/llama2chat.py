@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 def load_llama2chat() -> CTransformers:
     """Load Llama-2-chat model."""
-    logging.info(f"Loading llama2chat model ...")
+    logging.info("Loading llama2chat model ...")
     model = CTransformers(
         model=CFG.MODEL_LLAMA2CHAT,
         model_type=CFG.MODEL_TYPE,
@@ -40,7 +40,7 @@ def llama2_prompt(messages: List[Union[SystemMessage, HumanMessage, AIMessage]])
     E_SYS = "\n<</SYS>>\n\n"
     BOS = "<s>"
     EOS = "</s>"
-    DEFAULT_SYSTEM_PROMPT = f"""You are a helpful, respectful and honest assistant. \
+    DEFAULT_SYSTEM_PROMPT = """You are a helpful, respectful and honest assistant. \
 Always answer as helpfully as possible, while being safe. Please ensure that your responses \
 are socially unbiased and positive in nature. If a question does not make any sense, \
 or is not factually coherent, explain why instead of answering something not correct. \
