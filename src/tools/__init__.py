@@ -11,9 +11,13 @@ from langchain.schema import StrOutputParser
 from langchain.tools import BaseTool, Tool, WikipediaQueryRun
 from langchain.utilities.wikipedia import WikipediaAPIWrapper
 from langchain.utilities.serpapi import SerpAPIWrapper
+from langchain.utilities.wolfram_alpha import WolframAlphaAPIWrapper
 
-output_parser = StrOutputParser()
+from .newsapi import NewsAPITool
+from .yahoo_finance import YahooFinanceTool
+
 llm = GooglePalm(temperature=0.0)
+output_parser = StrOutputParser()
 
 # Wikipedia Tool
 _wikipedia = WikipediaAPIWrapper()
@@ -33,6 +37,20 @@ search_tool = Tool(
         issues, etc. Worth using for general topics. Use precise questions.",
 )
 
+# Wolfram Tool
+_wolfram = WolframAlphaAPIWrapper()
+wolfram_tool = Tool(
+    name="WolframAlpha",
+    func=_wolfram.run,
+    description="A useful tool for answering complex questions about math, such as solving equations, etc.",
+)
+
+# NewsAPI Tool
+newsapi_tool = NewsAPITool()
+
+# YahooFinance Tool
+yahoo_finance_tool = YahooFinanceTool()
+
 # Calculator Tool
 _MATH_CHAIN = llm_math.prompt.PROMPT | llm | output_parser
 
@@ -43,7 +61,7 @@ class CalculatorInput(BaseModel):
 
 class CustomCalculatorTool(BaseTool):
     name = "Calculator"
-    description = "A useful tool for answering questions about math"
+    description = "A useful tool for answering simple questions about math."
     args_schema: Type[BaseModel] = CalculatorInput
 
     def _run(
