@@ -28,17 +28,20 @@ class NewsAPITool(BaseTool):
                 "Could not import yfinance python package. "
                 "Please install it with `pip install newsapi-python`."
             )
-        
+
         try:
             newsapi = NewsApiClient(api_key=os.environ["NEWSAPI_API_KEY"])
         except KeyError:
-            raise("NEWSAPI_API_KEY is not found in environ.")
-            
+            raise ("NEWSAPI_API_KEY is not found in environ.")
+
         top_headlines = newsapi.get_top_headlines(q=query, sources=SOURCES)
 
-        result = "\n\n".join([
-            "\n".join([n["title"], n["description"]]) for n in top_headlines["articles"]
-        ])
+        result = "\n\n".join(
+            [
+                "\n".join([n["title"], n["description"]])
+                for n in top_headlines["articles"]
+            ]
+        )
         if not result:
             return f"No news found for '{query}'."
         return result

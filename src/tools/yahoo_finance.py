@@ -31,7 +31,7 @@ class YahooFinanceTool(BaseTool):
                 "Could not import yfinance python package. "
                 "Please install it with `pip install yfinance`."
             )
-        
+
         try:
             company = yfinance.Ticker(query)
         except (HTTPError, ReadTimeout, ConnectionError):
@@ -41,7 +41,7 @@ class YahooFinanceTool(BaseTool):
             df = company.history()
         except (HTTPError, ReadTimeout, ConnectionError):
             return f"No data found for company that searched with {query} ticker."
-    
+
         if df.empty:
             return f"No news found for company that searched with {query} ticker."
         return df
