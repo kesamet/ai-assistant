@@ -8,9 +8,9 @@ from langchain.callbacks.manager import (
 from langchain.chains import llm_math
 from langchain.llms.google_palm import GooglePalm
 from langchain.schema import StrOutputParser
-from langchain.tools import BaseTool, Tool, WikipediaQueryRun
-from langchain.utilities.wikipedia import WikipediaAPIWrapper
+from langchain.tools import BaseTool, Tool
 from langchain.utilities.serpapi import SerpAPIWrapper
+from langchain.utilities.wikipedia import WikipediaAPIWrapper
 from langchain.utilities.wolfram_alpha import WolframAlphaAPIWrapper
 
 from .newsapi import NewsAPITool
@@ -21,20 +21,24 @@ output_parser = StrOutputParser()
 
 # Wikipedia Tool
 _wikipedia = WikipediaAPIWrapper()
-wikipedia_tool = WikipediaQueryRun(api_wrapper=_wikipedia)
-# wikipedia_tool = Tool(
-#     name="Wikipedia",
-#     func=wikipedia.run,
-#     description="A useful tool for searching wikipedia to find information.",
-# )
+wikipedia_tool = Tool(
+    name="Wikipedia",
+    func=_wikipedia.run,
+    description=(
+        "A wrapper around Wikipedia. Useful for when you need to answer general questions about "
+        "people, places, companies, facts, historical events, or other subjects."
+    ),
+)
 
 # Web Search Tool
 _search = SerpAPIWrapper()
 search_tool = Tool(
     name="Web Search",
     func=_search.run,
-    description="A useful tool for searching the Internet to find information on world events, \
-        issues, etc. Worth using for general topics. Use precise questions.",
+    description=(
+        "A useful tool for searching the Internet to find information on general topics "
+        "such as world events, issues, etc. Use precise questions."
+    ),
 )
 
 # Wolfram Tool
@@ -42,7 +46,7 @@ _wolfram = WolframAlphaAPIWrapper()
 wolfram_tool = Tool(
     name="WolframAlpha",
     func=_wolfram.run,
-    description="A useful tool for answering complex questions about math, such as solving equations, etc.",
+    description="A useful tool for answering complex questions about math, such as solving equations.",
 )
 
 # NewsAPI Tool

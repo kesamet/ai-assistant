@@ -11,7 +11,10 @@ class NewsAPITool(BaseTool):
     """Tool that searches news using News API."""
 
     name: str = "news"
-    description: str = "Useful for when you need to get the top headlines"
+    description: str = (
+        "Useful when you need to get top headlines from major news sources "
+        "such as BBC News and Wall Street Journal."
+    )
     top_k: int = 10
     """The number of results to return."""
 

@@ -12,10 +12,8 @@ class YahooFinanceTool(BaseTool):
 
     name: str = "yahoo_finance"
     description: str = (
-        "Useful for when you need to find financial data "
-        "about a public company. "
-        "Input should be a company ticker. "
-        "For example, AAPL for Apple, MSFT for Microsoft."
+        "Useful for when you need to find financial data about a public company. "
+        "Input should be a company ticker. For example, AAPL for Apple, MSFT for Microsoft."
     )
 
     def _run(
