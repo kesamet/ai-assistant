@@ -46,7 +46,7 @@ def vision_assistant():
 
     img = Image.open(uploaded_file)
     st.image(img)
-    
+
     img_b64 = base64.b64encode(uploaded_file.getvalue()).decode("utf-8")
 
     # Display chat history
@@ -66,9 +66,12 @@ def vision_assistant():
             message = {
                 "role": "user",
                 "content": [
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}"}},
-                    {"type": "text", "text": user_input}
-                ]
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{img_b64}"},
+                    },
+                    {"type": "text", "text": user_input},
+                ],
             }
         else:
             message = {"role": "user", "content": user_input}

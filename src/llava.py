@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 def load_llava() -> Llama:
     """Load llava model."""
     logging.info("Loading llava model ...")
-    
+
     model = Llama(
         model_path=CFG.LLAVA_MODEL_PATH,
         chat_handler=Llava15ChatHandler(clip_model_path=CFG.CLIP_MODEL_PATH),
@@ -21,7 +21,6 @@ def load_llava() -> Llama:
     )
     logging.info("Model loaded")
     return model
-
 
 
 def encode_image(uri: str) -> str:
