@@ -19,8 +19,7 @@ class Request(BaseModel):
 
 @app.post("/")
 async def get_response(request: Request) -> Any:
-    payload = request.model_dump()
-    return {"content": LLM(payload["inputs"])}
+    return {"content": LLM(request.inputs)}
 
 
 if __name__ == "__main__":

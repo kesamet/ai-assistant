@@ -15,7 +15,7 @@ def load_llama2chat() -> CTransformers:
     """Load Llama-2-chat model."""
     logging.info("Loading llama2chat model ...")
     model = CTransformers(
-        model=CFG.MODEL_LLAMA2CHAT,
+        model=CFG.LLAMA2CHAT_MODEL_PATH,
         model_type=CFG.MODEL_TYPE,
         config={
             "max_new_tokens": CFG.MAX_NEW_TOKENS,

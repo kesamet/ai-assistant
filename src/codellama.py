@@ -13,7 +13,7 @@ def load_codellama() -> CTransformers:
     """Load codellama model."""
     logging.info("Loading codellama model ...")
     model = CTransformers(
-        model=CFG.MODEL_CODELLAMA,
+        model=CFG.CODELLAMA_MODEL_PATH,
         model_type=CFG.MODEL_TYPE,
         config={
             "max_new_tokens": CFG.MAX_NEW_TOKENS,

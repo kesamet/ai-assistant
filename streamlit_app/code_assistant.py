@@ -20,8 +20,8 @@ def get_answer(inputs: str) -> str:
     try:
         response = requests.post(api_url, headers=headers, json=payload)
         return response.json()["content"]
-    except Exception:
-        return "CodeLlama is not deployed"
+    except Exception as e:
+        return f"CodeLlama is probably not deployed: {e}"
 
 
 def code_assistant():
