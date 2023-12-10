@@ -10,7 +10,7 @@ def init_messages() -> None:
         st.session_state.aa_messages = []
 
 
-def get_output(user_input, messages) -> str:
+def get_output(user_input: str, messages: list) -> str:
     agent = build_agent(messages)
     try:
         return agent.run(user_input)
@@ -20,7 +20,10 @@ def get_output(user_input, messages) -> str:
 
 def ai_assistant():
     st.sidebar.title("AI Assistant")
-    st.sidebar.info("AI Assistant is powered by PaLM-2 and has access to wikipedia, search and calculator tools.")
+    st.sidebar.info(
+        "AI Assistant is powered by PaLM-2 and has access to wikipedia, search, "
+        "News API, Wolfram and calculator tools."
+    )
 
     init_messages()
 

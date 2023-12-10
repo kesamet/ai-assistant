@@ -3,12 +3,14 @@ import streamlit as st
 from streamlit_app.ai_assistant import ai_assistant
 from streamlit_app.chatbot import chatbot
 from streamlit_app.code_assistant import code_assistant
+from streamlit_app.vision_assistant import vision_assistant
 
 st.set_page_config(page_title="LLM-powered Assistant")
 
 
 def main():
     dict_pages = {
+        "Vision Assistant": vision_assistant,
         "AI Assistant": ai_assistant,
         "Code Assistant": code_assistant,
         "Chatbot": chatbot,
