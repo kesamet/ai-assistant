@@ -10,8 +10,8 @@ st.set_page_config(page_title="LLM-powered Assistant")
 
 def main():
     dict_pages = {
-        "AI Assistant": ai_assistant,
         "Vision Assistant": vision_assistant,
+        "AI Assistant": ai_assistant,
         "Code Assistant": code_assistant,
         "Chatbot": chatbot,
     }

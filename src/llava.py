@@ -27,3 +27,8 @@ def encode_image(uri: str) -> str:
     """Get base64 string from image URI."""
     with open(uri, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
+
+
+def get_response(model: Llama, messages: list) -> dict:
+    output = model.create_chat_completion(messages=messages)
+    return output

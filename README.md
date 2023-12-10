@@ -13,9 +13,23 @@ Activate the environment.
 conda activate assistant
 ```
 
-Download and save the LLM artefacts in `models/`. The models used in this demo are downloaded from [TheBloke](https://huggingface.co/TheBloke).
-- [Llama-2-7B-Chat-GGML](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGML/tree/main)
-- [CodeLlama-7B-GGUF](https://huggingface.co/TheBloke/CodeLlama-7B-GGUF/tree/main)
+
+## 💻 Vision Assistant App
+
+Download `ggml-model` and `mmprog-model` from [mys/ggml_llava-v1.5-7b](https://huggingface.co/mys/ggml_llava-v1.5-7b) and save them in `models/llava-7b/`. Update `CLIP_MODEL_PATH` and `LLAVA_MODEL_PATH` in `config.yaml` accordingly.
+
+Deploy LLAvA model as an endpoint
+```bash
+python -m serve_llava
+```
+
+Run Streamlit app and select `Vision Assistant`.
+```bash
+streamlit run app.py
+```
+
+
+## 💻 AI Assistant App
 
 We shall also use Google PaLM, SERP API, News API and Wolfram Alpha. As such, the following API keys are required:
 - PaLM: `GOOGLE_API_KEY`
@@ -24,10 +38,7 @@ We shall also use Google PaLM, SERP API, News API and Wolfram Alpha. As such, th
 - Wolfram Alpha: `WOLFRAM_ALPHA_APPID`
 Save these keys in `.env`.
 
-
-## 💻 App
-
-We use Streamlit as the interface for the demos:
+Run Streamlit app and select `AI Assistant`.
 ```bash
 streamlit run app.py
 ```

@@ -12,10 +12,10 @@ from src.tools import (
 )
 
 LLM = GooglePalm(temperature=0.0)
-BUFFER = 5
+MEMORY_BUFFER_WINDOW = 10
 
 
-def build_agent(messages):
+def build_agent(messages: list):
     memory = _build_memory(messages)
     agent = initialize_agent(
         [search_tool, wikipedia_tool, wolfram_tool, calculator_tool, newsapi_tool],
@@ -28,11 +28,11 @@ def build_agent(messages):
     return agent
 
 
-def _build_memory(messages):
+def _build_memory(messages: list):
     memory = ConversationBufferWindowMemory(
-        k=BUFFER, memory_key="chat_history", return_messages=True
+        k=MEMORY_BUFFER_WINDOW, memory_key="chat_history", return_messages=True
     )
-    for message in messages[-BUFFER * 2 :]:
+    for message in messages[-MEMORY_BUFFER_WINDOW:]:
         if isinstance(message, AIMessage):
             memory.chat_memory.add_ai_message(message.content)
         elif isinstance(message, HumanMessage):
