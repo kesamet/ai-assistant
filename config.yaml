@@ -1,5 +1,5 @@
-LLAMA2CHAT_MODEL_PATH: /home/kokmeng/Desktop/Dvorak/expts/models/llama-2-7b-chat.ggmlv3.q2_K.bin
-CODELLAMA_MODEL_PATH: /home/kokmeng/Desktop/Dvorak/expts/models/codellama-7b-instruct.Q2_K.gguf
+LLAMA2CHAT_MODEL_PATH: ./models/llama-2-7b-chat.ggmlv3.q2_K.bin
+CODELLAMA_MODEL_PATH: ./models/codellama-7b-instruct.Q2_K.gguf
 MODEL_TYPE: llama
 
 MAX_NEW_TOKENS: 512
@@ -7,8 +7,8 @@ TEMPERATURE: 0.2
 REPETITION_PENALTY: 1.1
 CONTEXT_LENGTH: 1024
 
-CLIP_MODEL_PATH: /home/kokmeng/Desktop/Dvorak/expts/models/llava-7b/mmproj-model-f16.gguf
-LLAVA_MODEL_PATH: /home/kokmeng/Desktop/Dvorak/expts/models/llava-7b/ggml-model-q4_k.gguf
+CLIP_MODEL_PATH: ./models/llava-7b/mmproj-model-f16.gguf
+LLAVA_MODEL_PATH: ./models/llava-7b/ggml-model-q4_k.gguf
 
 HOST: localhost
 PORT_LLAMA2CHAT: 8201
