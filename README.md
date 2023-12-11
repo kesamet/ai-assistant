@@ -28,6 +28,8 @@ Run Streamlit app and select `Vision Assistant`.
 streamlit run app.py
 ```
 
+![screenshot](./assets/screenshot.png)
+
 
 ## 💻 AI Assistant App
 
