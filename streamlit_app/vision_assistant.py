@@ -2,30 +2,34 @@ import base64
 import requests
 
 import streamlit as st
-from langchain.llms.google_palm import GooglePalm
 from langchain.schema import HumanMessage, AIMessage
 from PIL import Image
 
 from src import CFG
+from streamlit_app import get_http_status
+
+API_URL = f"http://{CFG.HOST}:{CFG.PORT_LLAVA}"
 
 # sliding window of the most recent interactions
 MEMORY_BUFFER_WINDOW = 6
-
-LLM = GooglePalm(temperature=0.0)  # TODO
 
 
 def init_messages() -> None:
     clear_button = st.sidebar.button("Clear Conversation", key="vision_assistant")
     if clear_button or "llava_messages" not in st.session_state:
-        # used in model
-        st.session_state.llava_messages = [
-            {
-                "role": "system",
-                "content": "You are an assistant who perfectly describes images.",
-            }
-        ]
-        # used for displaying
-        st.session_state.chv_messages = []
+        init_sess_state()
+
+
+def init_sess_state() -> None:
+    # llava_messages used in model
+    st.session_state.llava_messages = [
+        {
+            "role": "system",
+            "content": "You are an assistant who perfectly describes images.",
+        }
+    ]
+    # chv_messages used for displaying
+    st.session_state.chv_messages = []
 
 
 def buffer_window_memory(messages: list) -> list:
@@ -38,13 +42,9 @@ def buffer_window_memory(messages: list) -> list:
 
 
 def get_output(messages: list) -> str:
-    api_url = f"http://{CFG.HOST}:{CFG.PORT_LLAVA}"
     headers = {"Content-Type": "application/json"}
-    response = requests.post(api_url, headers=headers, json={"inputs": messages})
-    try:
-        return response.json()["choices"][0]["message"]
-    except Exception as e:
-        return f"Llava is probably not deployed: {e}"
+    response = requests.post(API_URL, headers=headers, json={"inputs": messages})
+    return response.json()["choices"][0]["message"]
 
 
 def vision_assistant():
@@ -52,6 +52,8 @@ def vision_assistant():
     st.sidebar.info(
         "Vision Assistant is powered by [LLaVA](https://llava-vl.github.io/)."
     )
+    st.sidebar.info(f"Running on {CFG.DEVICE}")
+    get_http_status(API_URL)
 
     uploaded_file = st.sidebar.file_uploader(
         "Upload your image", type=["png", "jpg", "jpeg"], accept_multiple_files=False
@@ -60,6 +62,7 @@ def vision_assistant():
     init_messages()
     if uploaded_file is None:
         st.info("Upload an image first.")
+        init_sess_state()
         return
 
     img = Image.open(uploaded_file)

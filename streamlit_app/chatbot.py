@@ -7,14 +7,16 @@ from langchain.schema import SystemMessage, HumanMessage, AIMessage
 
 from src import CFG
 from src.llama2chat import llama2_prompt
+from streamlit_app import get_http_status
 
 CHAT_MODELS = ["googlepalm", "gpt-4-0613", "llama-2"]
 
 
 class Llama2:
     def __init__(self, model_name) -> None:
-        if model_name == "llama-2-7b-chat":
+        if model_name.startswith("llama-2"):
             self._api_url = f"http://{CFG.HOST}:{CFG.PORT_LLAMA2CHAT}"
+            get_http_status(self._api_url)
         else:
             raise NotImplementedError
 
