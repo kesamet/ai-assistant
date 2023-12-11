@@ -3,7 +3,6 @@ import requests
 
 import streamlit as st
 from langchain.schema import HumanMessage, AIMessage
-from PIL import Image
 
 from src import CFG
 from streamlit_app import get_http_status
@@ -28,7 +27,7 @@ def init_sess_state() -> None:
         # chv_messages used for displaying
         st.session_state.chv_messages = []
         # image
-        st.session_state.image_bytes = ""
+        st.session_state.image_bytes = None
 
 
 def buffer_window_memory(messages: list) -> list:
@@ -61,13 +60,13 @@ def vision_assistant():
 
     init_sess_state()
 
-    if uploaded_file is None and st.session_state.image_bytes == "":
+    _img_bytes = uploaded_file or st.session_state.image_bytes
+    if _img_bytes is None:
         st.info("Upload an image first.")
         return
 
     c0, c1 = st.columns(2)
 
-    _img_bytes = uploaded_file or st.session_state.image_bytes
     c0.image(_img_bytes)
     st.session_state.image_bytes = _img_bytes
 
