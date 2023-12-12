@@ -5,6 +5,9 @@ from langchain.schema import HumanMessage, AIMessage
 
 from src import CFG
 from src.codellama import get_prompt
+from streamlit_app import get_http_status
+
+API_URL = f"http://{CFG.HOST}:{CFG.PORT_CODELLAMA}"
 
 
 def init_messages() -> None:
@@ -14,19 +17,17 @@ def init_messages() -> None:
 
 
 def get_answer(inputs: str) -> str:
-    api_url = f"http://{CFG.HOST}:{CFG.PORT_CODELLAMA}"
     payload = {"inputs": get_prompt(inputs)}
     headers = {"Content-Type": "application/json"}
-    try:
-        response = requests.post(api_url, headers=headers, json=payload)
-        return response.json()["content"]
-    except Exception as e:
-        return f"CodeLlama is probably not deployed: {e}"
+    response = requests.post(API_URL, headers=headers, json=payload)
+    return response.json()["content"]
 
 
 def code_assistant():
     st.sidebar.title("Code Assistant")
     st.sidebar.info("Code Assistant is powered by CodeLlama.")
+    st.sidebar.info(f"Running on {CFG.DEVICE}")
+    get_http_status(API_URL)
 
     init_messages()
 

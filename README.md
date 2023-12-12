@@ -18,7 +18,7 @@ conda activate assistant
 
 Download `ggml-model` and `mmprog-model` from [mys/ggml_llava-v1.5-7b](https://huggingface.co/mys/ggml_llava-v1.5-7b) and save them in `models/llava-7b/`. Update `CLIP_MODEL_PATH` and `LLAVA_MODEL_PATH` in `config.yaml` accordingly.
 
-Deploy LLAvA model as an endpoint
+Deploy LLAvA model as an endpoint.
 ```bash
 python -m serve_llava
 ```
@@ -27,6 +27,10 @@ Run Streamlit app and select `Vision Assistant`.
 ```bash
 streamlit run app.py
 ```
+
+<p align="center">
+    !<img src="./assets/screenshot.png" alt="screenshot" width="1000"/>
+</p>
 
 
 ## 💻 AI Assistant App
