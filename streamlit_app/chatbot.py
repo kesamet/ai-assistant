@@ -1,5 +1,5 @@
 import requests
-from typing import Any, Union
+from typing import Any
 
 import streamlit as st
 from langchain.chat_models import ChatOpenAI, ChatGooglePalm
