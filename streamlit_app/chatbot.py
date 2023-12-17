@@ -25,7 +25,7 @@ class GeminiPro:
         """
         import langchain_core.messages as gm
 
-        _messages = []       
+        _messages = []
         for message in messages:
             if isinstance(message, HumanMessage):
                 _messages.append(gm.HumanMessage(content=message.content))
@@ -48,7 +48,7 @@ class Llama2:
             return response.json()
         except Exception:
             return "Llama2 is not deployed"
-        
+
     def __str__(self):
         return self.model_name
 
@@ -67,7 +67,7 @@ class Mistral:
             return response.json()
         except Exception:
             return "Mistral is not deployed"
-        
+
     def __str__(self):
         return self.model_name
 
@@ -104,7 +104,9 @@ def get_answer(llm, messages) -> str:
             return answer["content"]
         return answer.content
     except Exception:
-        st.error(f"{llm} is not available. Did you provide an API key or deploy the model?")
+        st.error(
+            f"{llm} is not available. Did you provide an API key or deploy the model?"
+        )
         return ""
 
 
