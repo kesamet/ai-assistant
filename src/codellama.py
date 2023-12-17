@@ -1,8 +1,7 @@
 import logging
 
-from langchain.llms.ctransformers import CTransformers
-from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain.llms.ctransformers import CTransformers
 
 from src import CFG
 
@@ -13,15 +12,15 @@ def load_codellama() -> CTransformers:
     """Load codellama model."""
     logging.info("Loading codellama model ...")
     model = CTransformers(
-        model=CFG.CODELLAMA_MODEL_PATH,
-        model_type=CFG.MODEL_TYPE,
+        model=CFG.CODELLAMA.MODEL_PATH,
+        model_type=CFG.CODELLAMA.MODEL_TYPE,
         config={
             "max_new_tokens": CFG.MAX_NEW_TOKENS,
             "temperature": CFG.TEMPERATURE,
             "repetition_penalty": CFG.REPETITION_PENALTY,
             "context_length": CFG.CONTEXT_LENGTH,
         },
-        callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
+        callbacks=[StreamingStdOutCallbackHandler()],
         verbose=False,
     )
     logging.info("Model loaded")

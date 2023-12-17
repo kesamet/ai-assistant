@@ -28,12 +28,10 @@ Run Streamlit app and select `Vision Assistant`.
 streamlit run app.py
 ```
 
-<p align="center">
-    !<img src="./assets/screenshot.png" alt="screenshot" width="1000"/>
-</p>
+![screenshot](./assets/screenshot.png)
 
 
-## 💻 AI Assistant App
+## 💻 AI Agents App
 
 We shall also use Google PaLM, SERP API, News API and Wolfram Alpha. As such, the following API keys are required:
 - PaLM: `GOOGLE_API_KEY`
