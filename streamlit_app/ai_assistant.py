@@ -19,7 +19,7 @@ def get_output(user_input: str, messages: list) -> str:
 
 
 def ai_assistant():
-    st.sidebar.title("AI Assistant")
+    st.sidebar.title("AI Agents")
     st.sidebar.info(
         "AI Assistant is powered by PaLM-2 and has access to wikipedia, search, "
         "News API, Wolfram and calculator tools."

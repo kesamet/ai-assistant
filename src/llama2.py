@@ -1,7 +1,6 @@
 import logging
 from typing import List, Union
 
-from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms.ctransformers import CTransformers
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
@@ -11,19 +10,19 @@ from src import CFG
 logging.basicConfig(level=logging.INFO)
 
 
-def load_llama2chat() -> CTransformers:
-    """Load Llama-2-chat model."""
-    logging.info("Loading llama2chat model ...")
+def load_llama2() -> CTransformers:
+    """Load Llama-2 model."""
+    logging.info("Loading llama2 model ...")
     model = CTransformers(
-        model=CFG.LLAMA2CHAT_MODEL_PATH,
-        model_type=CFG.MODEL_TYPE,
+        model=CFG.LLAMA2.MODEL_PATH,
+        model_type=CFG.LLAMA2.MODEL_TYPE,
         config={
             "max_new_tokens": CFG.MAX_NEW_TOKENS,
             "temperature": CFG.TEMPERATURE,
             "repetition_penalty": CFG.REPETITION_PENALTY,
             "context_length": CFG.CONTEXT_LENGTH,
         },
-        callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
+        callbacks=[StreamingStdOutCallbackHandler()],
         verbose=False,
     )
     logging.info("Model loaded")
@@ -43,8 +42,7 @@ def llama2_prompt(messages: List[Union[SystemMessage, HumanMessage, AIMessage]])
     DEFAULT_SYSTEM_PROMPT = """You are a helpful, respectful and honest assistant. \
 Always answer as helpfully as possible, while being safe. Please ensure that your responses \
 are socially unbiased and positive in nature. If a question does not make any sense, \
-or is not factually coherent, explain why instead of answering something not correct. \
-If you don't know the answer to a question, please don't share false information."""
+or is not factually coherent, explain why instead of answering something not correct."""
 
     if messages[0]["role"] != "system":
         messages = [
@@ -76,18 +74,12 @@ def _convert_langchainschema_to_dict(
     Convert the chain of chat messages in list of langchain.schema format to
     list of dictionary format.
     """
-    return [
-        {"role": _find_role(message), "content": message.content}
-        for message in messages
-    ]
-
-
-def _find_role(message: Union[SystemMessage, HumanMessage, AIMessage]) -> str:
-    """Identify role name from langchain.schema object."""
-    if isinstance(message, SystemMessage):
-        return "system"
-    if isinstance(message, HumanMessage):
-        return "user"
-    if isinstance(message, AIMessage):
-        return "assistant"
-    raise TypeError("Unknown message type.")
+    _messages = []
+    for message in messages:
+        if isinstance(message, SystemMessage):
+            _messages.append({"role": "system", "content": message.content})
+        elif isinstance(message, HumanMessage):
+            _messages.append({"role": "user", "content": message.content})
+        elif isinstance(message, AIMessage):
+            _messages.append({"role": "assistant", "content": message.content})
+    return _messages
