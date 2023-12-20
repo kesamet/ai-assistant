@@ -40,7 +40,7 @@ We shall also use Google PaLM, SERP API, News API and Wolfram Alpha. As such, th
 - Wolfram Alpha: `WOLFRAM_ALPHA_APPID`
 Save these keys in `.env`.
 
-Run Streamlit app and select `AI Assistant`.
+Run Streamlit app and select `AI Agents`.
 ```bash
 streamlit run app.py
 ```
