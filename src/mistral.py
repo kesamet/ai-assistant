@@ -1,4 +1,5 @@
 import logging
+import os
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms.ctransformers import CTransformers
@@ -12,7 +13,7 @@ def load_mistral() -> CTransformers:
     """Load mistral model."""
     logging.info("Loading mistral model ...")
     model = CTransformers(
-        model=CFG.MISTRAL.MODEL_PATH,
+        model=os.path.join(CFG.MODELS_DIR, CFG.MISTRAL.MODEL_PATH),
         model_type=CFG.MISTRAL.MODEL_TYPE,
         config={
             "max_new_tokens": CFG.MAX_NEW_TOKENS,
@@ -21,7 +22,6 @@ def load_mistral() -> CTransformers:
             "context_length": CFG.CONTEXT_LENGTH,
         },
         callbacks=[StreamingStdOutCallbackHandler()],
-        verbose=False,
     )
     logging.info("Model loaded")
     return model

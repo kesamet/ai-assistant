@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import List, Union
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
@@ -14,7 +15,7 @@ def load_llama2() -> CTransformers:
     """Load Llama-2 model."""
     logging.info("Loading llama2 model ...")
     model = CTransformers(
-        model=CFG.LLAMA2.MODEL_PATH,
+        model=os.path.join(CFG.MODELS_DIR, CFG.LLAMA2.MODEL_PATH),
         model_type=CFG.LLAMA2.MODEL_TYPE,
         config={
             "max_new_tokens": CFG.MAX_NEW_TOKENS,
@@ -23,7 +24,6 @@ def load_llama2() -> CTransformers:
             "context_length": CFG.CONTEXT_LENGTH,
         },
         callbacks=[StreamingStdOutCallbackHandler()],
-        verbose=False,
     )
     logging.info("Model loaded")
     return model
