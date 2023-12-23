@@ -16,7 +16,7 @@ CHAT_MODELS = ["gemini-pro", "googlepalm", "gpt-4-0613", "llama-2", "mistral"]
 class GeminiPro:
     """Wrapper of ChatGoogleGenerativeAI."""
 
-    def __init__(self, model_name) -> None:
+    def __init__(self, model_name="gemini-pro") -> None:
         self.llm = ChatGoogleGenerativeAI(model=model_name, temperature=CFG.TEMPERATURE)
 
     def __call__(self, messages, *args: Any, **kwds: Any) -> dict:

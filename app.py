@@ -1,17 +1,17 @@
 import streamlit as st
 
-from streamlit_app.ai_assistant import ai_assistant
+from streamlit_app.ai_agents import ai_agents
 from streamlit_app.chatbot import chatbot
 from streamlit_app.code_assistant import code_assistant
 from streamlit_app.vision_assistant import vision_assistant
 
-st.set_page_config(page_title="Virtual Assistants")
+st.set_page_config(page_title="AI Assistants")
 
 
 def main():
     dict_pages = {
         "Vision Assistant": vision_assistant,
-        "AI Agents": ai_assistant,
+        "AI Agents": ai_agents,
         "Code Assistant": code_assistant,
         "Chatbot Playground": chatbot,
     }

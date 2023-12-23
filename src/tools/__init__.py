@@ -17,7 +17,6 @@ from .newsapi import NewsAPITool
 from .yahoo_finance import YahooFinanceTool
 
 llm = GooglePalm(temperature=0.0)
-output_parser = StrOutputParser()
 
 # Wikipedia Tool
 _wikipedia = WikipediaAPIWrapper()
@@ -56,7 +55,7 @@ newsapi_tool = NewsAPITool()
 yahoo_finance_tool = YahooFinanceTool()
 
 # Calculator Tool
-_MATH_CHAIN = llm_math.prompt.PROMPT | llm | output_parser
+_MATH_CHAIN = llm_math.prompt.PROMPT | llm | StrOutputParser()
 
 
 class CalculatorInput(BaseModel):
