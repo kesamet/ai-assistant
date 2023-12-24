@@ -2,7 +2,7 @@ import requests
 from typing import Any
 
 import streamlit as st
-from langchain.chat_models import ChatOpenAI, ChatGooglePalm
+from langchain.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -10,7 +10,7 @@ from src import CFG
 from src.llama2 import llama2_prompt
 from streamlit_app import get_http_status
 
-CHAT_MODELS = ["gemini-pro", "googlepalm", "gpt-4-0613", "llama-2", "mistral"]
+CHAT_MODELS = ["gemini-pro", "gpt-4-0613", "llama-2", "mistral"]
 
 
 class GeminiPro:
@@ -86,8 +86,6 @@ def select_llm():
     model_name = st.sidebar.radio("Select chat model", CHAT_MODELS)
     if model_name.startswith("gemini"):
         return GeminiPro(model_name)
-    if model_name == "googlepalm":
-        return ChatGooglePalm(temperature=CFG.TEMPERATURE)
     if model_name.startswith("gpt-"):
         return ChatOpenAI(temperature=CFG.TEMPERATURE, model_name=model_name)
     if model_name.startswith("llama"):

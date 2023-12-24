@@ -15,7 +15,7 @@ def get_output(user_input: str, messages: list) -> str:
     try:
         return agent.run(user_input)
     except Exception:
-        return "GooglePalm is not available. Did you provide an API key?"
+        return "GoogleGenerativeAI is not available. Did you provide an API key?"
 
 
 def ai_agents():
