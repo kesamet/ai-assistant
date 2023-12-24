@@ -6,17 +6,17 @@ from langchain.callbacks.manager import (
     CallbackManagerForToolRun,
 )
 from langchain.chains import llm_math
-from langchain.llms.google_palm import GooglePalm
 from langchain.schema import StrOutputParser
 from langchain.tools import BaseTool, Tool
 from langchain.utilities.serpapi import SerpAPIWrapper
 from langchain.utilities.wikipedia import WikipediaAPIWrapper
 from langchain.utilities.wolfram_alpha import WolframAlphaAPIWrapper
+from langchain_google_genai import GoogleGenerativeAI
 
 from .newsapi import NewsAPITool
 from .yahoo_finance import YahooFinanceTool
 
-llm = GooglePalm(temperature=0.0)
+llm = GoogleGenerativeAI(model="models/text-bison-001", temperature=0.0)
 
 # Wikipedia Tool
 _wikipedia = WikipediaAPIWrapper()

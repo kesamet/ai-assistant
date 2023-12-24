@@ -1,7 +1,7 @@
 from langchain.agents import AgentType, initialize_agent
 from langchain.memory import ConversationBufferWindowMemory
-from langchain.llms.google_palm import GooglePalm
 from langchain.schema import HumanMessage, AIMessage
+from langchain_google_genai import GoogleGenerativeAI
 
 from src.tools import (
     search_tool,
@@ -11,7 +11,7 @@ from src.tools import (
     newsapi_tool,
 )
 
-LLM = GooglePalm(temperature=0.0)
+LLM = GoogleGenerativeAI(model="models/text-bison-001", temperature=0.0)
 MEMORY_BUFFER_WINDOW = 10
 
 

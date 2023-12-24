@@ -6,8 +6,8 @@ dependencies:
   - fastapi==0.104.1
   - google-generativeai==0.3.1
   - google-search-results==2.4.2
-  - langchain==0.0.340
-  - langchain-google-genai==0.0.4
+  - langchain==0.0.352
+  - langchain-google-genai==0.0.5
   - llama-cpp-python==0.2.23
   - newsapi-python==0.2.7
   - python-dotenv==1.0.0
