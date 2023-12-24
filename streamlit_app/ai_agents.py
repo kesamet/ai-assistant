@@ -5,7 +5,7 @@ from src.agents import build_agent
 
 
 def init_messages() -> None:
-    clear_button = st.sidebar.button("Clear Conversation", key="ai_assistant")
+    clear_button = st.sidebar.button("Clear Conversation", key="ai_agents")
     if clear_button or "aa_messages" not in st.session_state:
         st.session_state.aa_messages = []
 
@@ -15,13 +15,13 @@ def get_output(user_input: str, messages: list) -> str:
     try:
         return agent.run(user_input)
     except Exception:
-        return "GooglePalm is not available. Did you provide an API key?"
+        return "GoogleGenerativeAI is not available. Did you provide an API key?"
 
 
-def ai_assistant():
+def ai_agents():
     st.sidebar.title("AI Agents")
     st.sidebar.info(
-        "AI Assistant is powered by PaLM-2 and has access to wikipedia, search, "
+        "AI Assistant is powered by text-bison and has access to wikipedia, search, "
         "News API, Wolfram and calculator tools."
     )
 

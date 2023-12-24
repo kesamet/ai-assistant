@@ -33,8 +33,8 @@ streamlit run app.py
 
 ## 💻 AI Agents App
 
-We shall also use Google PaLM, SERP API, News API and Wolfram Alpha. As such, the following API keys are required:
-- PaLM: `GOOGLE_API_KEY`
+We shall also use Google, SERP API, News API and Wolfram Alpha. As such, the following API keys are required:
+- Google: `GOOGLE_API_KEY`
 - SERP API: `SERPAPI_API_KEY`
 - News API: `NEWSAPI_API_KEY`
 - Wolfram Alpha: `WOLFRAM_ALPHA_APPID`
