@@ -4,19 +4,21 @@ from typing import Any
 import streamlit as st
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
 
 from src import CFG
 from src.llama2 import llama2_prompt
 from streamlit_app import get_http_status
 
-CHAT_MODELS = ["gemini-pro", "gpt-4-0613", "llama-2", "mistral"]
+CHAT_MODELS = ["gemini-pro", "gpt-4-0613", "llama-2", "mistral", "llamacpp"]
 
 
 class GeminiPro:
     """Wrapper of ChatGoogleGenerativeAI."""
 
-    def __init__(self, model_name="gemini-pro") -> None:
+    def __init__(self, model_name: str = "gemini-pro") -> None:
+        from langchain_google_genai import ChatGoogleGenerativeAI
+
+        self.model_name = model_name
         self.llm = ChatGoogleGenerativeAI(model=model_name, temperature=CFG.TEMPERATURE)
 
     def __call__(self, messages, *args: Any, **kwds: Any) -> dict:
@@ -32,6 +34,9 @@ class GeminiPro:
             elif isinstance(message, AIMessage):
                 _messages.append(gm.AIMessage(content=message.content))
         return self.llm.invoke(_messages)
+
+    def __str__(self):
+        return self.model_name
 
 
 class Llama2:
@@ -72,6 +77,31 @@ class Mistral:
         return self.model_name
 
 
+class LocalChatOpenAI:
+    def __init__(
+        self,
+        openai_api_base: str = "http://localhost:8000/v1",
+        temperature: float = 0.2,
+        **kwargs,
+    ) -> None:
+        from langchain.chat_models import ChatOpenAI
+
+        self.openai_api_base = openai_api_base
+        self.llm = ChatOpenAI(
+            openai_api_base=openai_api_base,
+            openai_api_key="sk-xxx",
+            temperature=temperature,
+            streaming=True,
+            **kwargs,
+        )
+
+    def __call__(self, messages, *args: Any, **kwds: Any) -> dict:
+        return self.llm.invoke(messages)
+
+    def __str__(self):
+        return self.openai_api_base
+
+
 def init_messages() -> None:
     clear_button = st.sidebar.button("Clear Conversation", key="chatbot")
     if clear_button or "ch_messages" not in st.session_state:
@@ -88,10 +118,12 @@ def select_llm():
         return GeminiPro(model_name)
     if model_name.startswith("gpt-"):
         return ChatOpenAI(temperature=CFG.TEMPERATURE, model_name=model_name)
-    if model_name.startswith("llama"):
+    if model_name == "llama-2":
         return Llama2(model_name)
-    if model_name.startswith("mistral"):
+    if model_name == "mistral":
         return Mistral(model_name)
+    if model_name == "llamacpp":
+        return LocalChatOpenAI()
     raise NotImplementedError
 
 
