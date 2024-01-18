@@ -25,7 +25,7 @@ class PromptFormat:
             messages = messages[1:]
 
         chat_history = [
-            (prompt, answer) for prompt, answer in zip(messages[::2], messages[1::2])
+            (prompt["content"], answer["content"]) for prompt, answer in zip(messages[::2], messages[1::2])
         ]
 
         user_prompt = messages[-1]["content"]

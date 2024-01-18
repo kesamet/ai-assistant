@@ -6,7 +6,6 @@ from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
 
 from src import CFG
-from src.prompt_format import Llama2Format, MistralFormat
 from streamlit_app import get_http_status
 
 CHAT_MODELS = ["gemini-pro", "gpt-4-0613", "llama-2", "mistral", "llamacpp"]
@@ -25,7 +24,7 @@ class GeminiPro:
             model=model_name, temperature=CFG.LLM_CONFIG.TEMPERATURE
         )
 
-    def __call__(self, messages, *args: Any, **kwds: Any) -> dict:
+    def __call__(self, messages: list, *args: Any, **kwds: Any) -> dict:
         """Converts messages to Human or AI (user/assistant) messages supported by Gemini first
         before calling the API
         """
@@ -33,47 +32,27 @@ class GeminiPro:
 
         _messages = []
         for message in messages:
-            if isinstance(message, HumanMessage):
-                _messages.append(gm.HumanMessage(content=message.content))
-            elif isinstance(message, AIMessage):
-                _messages.append(gm.AIMessage(content=message.content))
+            if message["role"] == "user":
+                _messages.append(gm.HumanMessage(content=message["content"]))
+            elif message["role"] == "assistant":
+                _messages.append(gm.AIMessage(content=message["content"]))
         return self.llm.invoke(_messages)
 
     def __str__(self):
         return self.model_name
 
 
-class Llama2:
-    def __init__(self, model_name) -> None:
+class LocalChat:
+    def __init__(self, model_name: str, api_url: str) -> None:
         self.model_name = model_name
-        self._api_url = f"http://{CFG.HOST}:{CFG.PORT_LLAMA2}"
-        get_http_status(self._api_url)
-        self.prompt_format = Llama2Format()
+        self.api_url = api_url
+        get_http_status(api_url)
 
     def __call__(self, messages, *args: Any, **kwds: Any) -> dict:
-        payload = {"messages": messages}
-        headers = {"Content-Type": "application/json"}
         response = requests.post(
-            self._api_url + "/v1/chat/completions", headers=headers, json=payload
-        )
-        return response.json()["choices"][0]["message"]
-
-    def __str__(self):
-        return self.model_name
-
-
-class Mistral:
-    def __init__(self, model_name) -> None:
-        self.model_name = model_name
-        self._api_url = f"http://{CFG.HOST}:{CFG.PORT_MISTRAL}"
-        get_http_status(self._api_url)
-        self.prompt_format = MistralFormat()
-
-    def __call__(self, messages, *args: Any, **kwds: Any) -> dict:
-        payload = {"messages": messages}
-        headers = {"Content-Type": "application/json"}
-        response = requests.post(
-            self._api_url + "/v1/chat/completions", headers=headers, json=payload
+            self.api_url + "/v1/chat/completions",
+            headers={"Content-Type": "application/json"},
+            json={"messages": messages},
         )
         return response.json()["choices"][0]["message"]
 
@@ -82,17 +61,12 @@ class Mistral:
 
 
 class LocalChatOpenAI:
-    def __init__(
-        self,
-        openai_api_base: str = "http://localhost:8000/v1",
-        temperature: float = 0.2,
-        **kwargs,
-    ) -> None:
+    def __init__(self, openai_api_base: str, **kwargs) -> None:
         self.openai_api_base = openai_api_base
         self.llm = ChatOpenAI(
             openai_api_base=openai_api_base,
             openai_api_key="sk-xxx",
-            temperature=temperature,
+            temperature=CFG.LLM_CONFIG.TEMPERATURE,
             streaming=True,
             **kwargs,
         )
@@ -117,11 +91,11 @@ def select_llm():
     if model_name.startswith("gpt-"):
         return ChatOpenAI(temperature=CFG.LLM_CONFIG.TEMPERATURE, model_name=model_name)
     if model_name == "llama-2":
-        return Llama2(model_name)
+        return LocalChat(model_name, f"http://{CFG.HOST}:{CFG.PORT_LLAMA2}")
     if model_name == "mistral":
-        return Mistral(model_name)
+        return LocalChat(model_name, f"http://{CFG.HOST}:{CFG.PORT_MISTRAL}")
     if model_name == "llamacpp":
-        return LocalChatOpenAI()
+        return LocalChatOpenAI("http://localhost:8000/v1")
     raise NotImplementedError
 
 
