@@ -1,5 +1,4 @@
-# MODELS_DIR: ./models
-MODELS_DIR: /home/kokmeng/Desktop/Dvorak/expts/models
+MODELS_DIR: ./models
 
 LLAMA2:
   MODEL_NAME: llama-2-7b-chat

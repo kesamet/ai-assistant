@@ -33,10 +33,10 @@ class GeminiPro:
 
         _messages = []
         for message in messages:
-            if message["role"] == "user":
-                _messages.append(gm.HumanMessage(content=message["content"]))
-            elif message["role"] == "assistant":
-                _messages.append(gm.AIMessage(content=message["content"]))
+            if isinstance(message, HumanMessage):
+                _messages.append(gm.HumanMessage(content=message.content))
+            elif isinstance(message, AIMessage):
+                _messages.append(gm.AIMessage(content=message.content))
         return self.llm.invoke(_messages)
 
     def __str__(self):
