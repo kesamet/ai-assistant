@@ -6,14 +6,15 @@ dependencies:
   - fastapi==0.104.1
   - google-generativeai==0.3.1
   - google-search-results==2.4.2
-  - langchain==0.0.352
+  - langchain==0.1.1
   - langchain-google-genai==0.0.5
-  - llama-cpp-python==0.2.25
+  - langchain-openai
+  - llama-cpp-python==0.2.29
   - newsapi-python==0.2.7
   - python-dotenv==1.0.0
   - python-box==7.1.1
   - sentence-transformers==2.2.2
-  - streamlit==1.29.0
+  - streamlit==1.30.0
   - uvicorn==0.23.2
   - wikipedia==1.4.0
   - wolframalpha==5.0.0

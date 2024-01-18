@@ -1,15 +1,17 @@
 import requests
-from typing import Any
+from typing import Any, List, Union
 
 import streamlit as st
-from langchain.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
+from langchain_openai import ChatOpenAI
 
 from src import CFG
-from src.llama2 import llama2_prompt
+from src.prompt_format import Llama2Format, MistralFormat
 from streamlit_app import get_http_status
 
 CHAT_MODELS = ["gemini-pro", "gpt-4-0613", "llama-2", "mistral", "llamacpp"]
+
+SYSTEM_PROMPT = "You are a helpful AI assistant. Reply your answer in markdown format."
 
 
 class GeminiPro:
@@ -19,7 +21,9 @@ class GeminiPro:
         from langchain_google_genai import ChatGoogleGenerativeAI
 
         self.model_name = model_name
-        self.llm = ChatGoogleGenerativeAI(model=model_name, temperature=CFG.TEMPERATURE)
+        self.llm = ChatGoogleGenerativeAI(
+            model=model_name, temperature=CFG.LLM_CONFIG.TEMPERATURE
+        )
 
     def __call__(self, messages, *args: Any, **kwds: Any) -> dict:
         """Converts messages to Human or AI (user/assistant) messages supported by Gemini first
@@ -29,10 +33,10 @@ class GeminiPro:
 
         _messages = []
         for message in messages:
-            if isinstance(message, HumanMessage):
-                _messages.append(gm.HumanMessage(content=message.content))
-            elif isinstance(message, AIMessage):
-                _messages.append(gm.AIMessage(content=message.content))
+            if message["role"] == "user":
+                _messages.append(gm.HumanMessage(content=message["content"]))
+            elif message["role"] == "assistant":
+                _messages.append(gm.AIMessage(content=message["content"]))
         return self.llm.invoke(_messages)
 
     def __str__(self):
@@ -44,15 +48,15 @@ class Llama2:
         self.model_name = model_name
         self._api_url = f"http://{CFG.HOST}:{CFG.PORT_LLAMA2}"
         get_http_status(self._api_url)
+        self.prompt_format = Llama2Format()
 
     def __call__(self, messages, *args: Any, **kwds: Any) -> dict:
-        payload = {"inputs": llama2_prompt(messages)}
+        payload = {"messages": messages}
         headers = {"Content-Type": "application/json"}
-        try:
-            response = requests.post(self._api_url, headers=headers, json=payload)
-            return response.json()
-        except Exception:
-            return "Llama2 is not deployed"
+        response = requests.post(
+            self._api_url + "/v1/chat/completions", headers=headers, json=payload
+        )
+        return response.json()["choices"][0]["message"]
 
     def __str__(self):
         return self.model_name
@@ -63,15 +67,15 @@ class Mistral:
         self.model_name = model_name
         self._api_url = f"http://{CFG.HOST}:{CFG.PORT_MISTRAL}"
         get_http_status(self._api_url)
+        self.prompt_format = MistralFormat()
 
     def __call__(self, messages, *args: Any, **kwds: Any) -> dict:
-        payload = {"inputs": llama2_prompt(messages)}
+        payload = {"messages": messages}
         headers = {"Content-Type": "application/json"}
-        try:
-            response = requests.post(self._api_url, headers=headers, json=payload)
-            return response.json()
-        except Exception:
-            return "Mistral is not deployed"
+        response = requests.post(
+            self._api_url + "/v1/chat/completions", headers=headers, json=payload
+        )
+        return response.json()["choices"][0]["message"]
 
     def __str__(self):
         return self.model_name
@@ -84,8 +88,6 @@ class LocalChatOpenAI:
         temperature: float = 0.2,
         **kwargs,
     ) -> None:
-        from langchain.chat_models import ChatOpenAI
-
         self.openai_api_base = openai_api_base
         self.llm = ChatOpenAI(
             openai_api_base=openai_api_base,
@@ -105,11 +107,7 @@ class LocalChatOpenAI:
 def init_messages() -> None:
     clear_button = st.sidebar.button("Clear Conversation", key="chatbot")
     if clear_button or "ch_messages" not in st.session_state:
-        st.session_state.ch_messages = [
-            SystemMessage(
-                content="You are a helpful AI assistant. Reply your answer in markdown format."
-            )
-        ]
+        st.session_state.ch_messages = [{"content": SYSTEM_PROMPT, "role": "system"}]
 
 
 def select_llm():
@@ -117,7 +115,7 @@ def select_llm():
     if model_name.startswith("gemini"):
         return GeminiPro(model_name)
     if model_name.startswith("gpt-"):
-        return ChatOpenAI(temperature=CFG.TEMPERATURE, model_name=model_name)
+        return ChatOpenAI(temperature=CFG.LLM_CONFIG.TEMPERATURE, model_name=model_name)
     if model_name == "llama-2":
         return Llama2(model_name)
     if model_name == "mistral":
@@ -127,16 +125,29 @@ def select_llm():
     raise NotImplementedError
 
 
+def _convert_langchainschema_to_dict(
+    messages: List[Union[SystemMessage, HumanMessage, AIMessage]]
+) -> List[dict]:
+    """Converts list of chat messages in langchain.schema format to list of dict."""
+    _messages = []
+    for message in messages:
+        if isinstance(message, SystemMessage):
+            _messages.append({"role": "system", "content": message.content})
+        elif isinstance(message, HumanMessage):
+            _messages.append({"role": "user", "content": message.content})
+        elif isinstance(message, AIMessage):
+            _messages.append({"role": "assistant", "content": message.content})
+    return _messages
+
+
 def get_answer(llm, messages) -> str:
     try:
-        answer = llm(messages)
+        answer = llm(_convert_langchainschema_to_dict(messages))
         if isinstance(answer, dict):
             return answer["content"]
         return answer.content
-    except Exception:
-        st.error(
-            f"{llm} is not available. Did you provide an API key or deploy the model?"
-        )
+    except Exception as e:
+        st.error(e)
         return ""
 
 

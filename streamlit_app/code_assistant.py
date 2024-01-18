@@ -4,7 +4,6 @@ import streamlit as st
 from langchain.schema import HumanMessage, AIMessage
 
 from src import CFG
-from src.codellama import get_prompt
 from streamlit_app import get_http_status
 
 API_URL = f"http://{CFG.HOST}:{CFG.PORT_CODELLAMA}"
@@ -16,11 +15,13 @@ def init_messages() -> None:
         st.session_state.ca_messages = []
 
 
-def get_answer(inputs: str) -> str:
-    payload = {"inputs": get_prompt(inputs)}
-    headers = {"Content-Type": "application/json"}
-    response = requests.post(API_URL, headers=headers, json=payload)
-    return response.json()["content"]
+def get_answer(user_input: str) -> str:
+    response = requests.post(
+        API_URL,
+        headers={"Content-Type": "application/json"},
+        json={"messages": [{"role": "user", "content": user_input}]},
+    )
+    return response.json()["choices"][0]["message"]["content"]
 
 
 def code_assistant():
