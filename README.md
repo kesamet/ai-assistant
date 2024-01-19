@@ -6,10 +6,6 @@ You will need to set up your development environment using conda, which you can 
 
 ```bash
 conda env create --name assistant -f environment.yaml --force
-```
-
-Activate the environment.
-```bash
 conda activate assistant
 ```
 

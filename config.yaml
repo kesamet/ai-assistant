@@ -1,24 +1,28 @@
-MODELS_DIR: ./
+MODELS_DIR: ./models
 
 LLAMA2:
-  MODEL_PATH: ./models/llama-2-7b-chat.Q4_K_M.gguf
+  MODEL_NAME: llama-2-7b-chat
+  MODEL_PATH: llama-2-7b-chat.Q4_K_M.gguf
   MODEL_TYPE: llama
 
 CODELLAMA:
-  MODEL_PATH: ./models/codellama-7b-instruct.Q2_K.gguf
+  MODEL_NAME: codellama-7b-instruct
+  MODEL_PATH: codellama-7b-instruct.Q2_K.gguf
   MODEL_TYPE: llama
 
 MISTRAL:
-  MODEL_PATH: ./models/mistral-7b-instruct-v0.2.Q4_K_M.gguf
+  MODEL_NAME: mistral-7b-instruct-v0.2
+  MODEL_PATH: mistral-7b-instruct-v0.2.Q4_K_M.gguf
   MODEL_TYPE: mistral
 
-MAX_NEW_TOKENS: 512
-TEMPERATURE: 0.2
-REPETITION_PENALTY: 1.1
-CONTEXT_LENGTH: 1024
+LLM_CONFIG:
+  MAX_NEW_TOKENS: 512
+  TEMPERATURE: 0.2
+  REPETITION_PENALTY: 1.1
+  CONTEXT_LENGTH: 2048
 
-CLIP_MODEL_PATH: ./models/llava-7b/mmproj-model-f16.gguf
-LLAVA_MODEL_PATH: ./models/llava-7b/ggml-model-q4_k.gguf
+CLIP_MODEL_PATH: llava-7b/mmproj-model-f16.gguf
+LLAVA_MODEL_PATH: llava-7b/ggml-model-q4_k.gguf
 
 HOST: localhost
 PORT_LLAMA2: 8201
