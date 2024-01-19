@@ -8,7 +8,7 @@ dependencies:
   - google-search-results==2.4.2
   - langchain==0.1.1
   - langchain-google-genai==0.0.5
-  - langchain-openai
+  - langchain-openai==0.0.2.post1
   - llama-cpp-python==0.2.29
   - newsapi-python==0.2.7
   - python-dotenv==1.0.0

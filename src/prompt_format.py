@@ -8,18 +8,16 @@ class PromptFormat:
     E_SYS = ""
     BOS = ""
     EOS = ""
-    DEFAULT_SYSTEM_PROMPT = (
+    SYSTEM_PROMPT = (
         "You are a helpful, respectful and honest assistant. "
-        "Always answer as helpfully as possible, while being safe. Please ensure that your responses "
-        "are socially unbiased and positive in nature. If a question does not make any sense, "
-        "or is not factually coherent, explain why instead of answering something not correct."
+        "Always answer as helpfully as possible, while being safe."
     )
 
     def get_prompt(self, messages: List[Dict[str, str]]) -> str:
         """Converts messages to compliant prompt format."""
         # if messages are in langchain.schema, convert to dict
         if messages[0]["role"] != "system":
-            system_prompt = self.DEFAULT_SYSTEM_PROMPT
+            system_prompt = self.SYSTEM_PROMPT
         else:
             system_prompt = messages[0]["content"].strip()
             messages = messages[1:]
@@ -65,7 +63,7 @@ class CodeLlamaFormat(PromptFormat):
     E_SYS = "\n<</SYS>>\n\n"
     BOS = "<s>"
     EOS = "</s>"
-    DEFAULT_SYSTEM_PROMPT = "You are a helpful, respectful and honest code assistant."
+    SYSTEM_PROMPT = "You are a helpful, respectful and honest code assistant."
 
 
 class MistralFormat(PromptFormat):
