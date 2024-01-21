@@ -6,7 +6,6 @@ from langchain.schema import ChatMessage, HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
 
 from src import CFG
-from streamlit_app import get_http_status
 
 CHAT_MODELS = ["gemini-pro", "gpt-4-0613", "llama-2", "mistral", "llamacpp"]
 
@@ -42,7 +41,6 @@ class LocalChat:
     def __init__(self, model_name: str, api_url: str) -> None:
         self.model_name = model_name
         self.api_url = api_url
-        get_http_status(api_url)
 
     def __call__(self, messages: List[ChatMessage], *args: Any, **kwds: Any) -> dict:
         response = requests.post(
