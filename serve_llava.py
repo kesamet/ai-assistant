@@ -1,5 +1,3 @@
-from typing import Any
-
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -17,7 +15,7 @@ class Request(BaseModel):
 
 
 @app.post("/")
-async def get_response(request: Request) -> Any:
+async def get_response(request: Request) -> dict:
     output = LLM.create_chat_completion(messages=request.inputs)
     return output
 
