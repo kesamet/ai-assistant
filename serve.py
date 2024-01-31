@@ -2,7 +2,7 @@ import argparse
 import time
 import uuid
 import asyncio
-from typing import AsyncIterable, Awaitable, Dict, List
+from typing import AsyncIterable, Awaitable
 
 import uvicorn
 from fastapi import FastAPI
@@ -21,7 +21,7 @@ ASYNC_CALLBACK = AsyncIteratorCallbackHandler()
 
 
 class Request(BaseModel):
-    messages: List[Dict[str, str]]
+    messages: list[dict[str, str]]
 
 
 app = FastAPI()

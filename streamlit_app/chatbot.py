@@ -1,12 +1,11 @@
 import requests
-from typing import Any, List
+from typing import Any
 
 import streamlit as st
 from langchain.schema import ChatMessage, HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
 
 from src import CFG
-from streamlit_app import get_http_status
 
 CHAT_MODELS = ["gemini-pro", "gpt-4-0613", "llama-2", "mistral", "llamacpp"]
 
@@ -22,7 +21,7 @@ class GeminiPro:
             model=model_name, temperature=CFG.LLM_CONFIG.TEMPERATURE
         )
 
-    def __call__(self, messages: List[ChatMessage], *args: Any, **kwds: Any) -> dict:
+    def __call__(self, messages: list[ChatMessage], *args: Any, **kwds: Any) -> dict:
         # Converts messages to Human or AI messages first before calling the API
         _messages = list()
         for message in messages:
@@ -42,9 +41,8 @@ class LocalChat:
     def __init__(self, model_name: str, api_url: str) -> None:
         self.model_name = model_name
         self.api_url = api_url
-        get_http_status(api_url)
 
-    def __call__(self, messages: List[ChatMessage], *args: Any, **kwds: Any) -> dict:
+    def __call__(self, messages: list[ChatMessage], *args: Any, **kwds: Any) -> dict:
         response = requests.post(
             self.api_url + "/v1/chat/completions",
             headers={"Content-Type": "application/json"},
@@ -56,7 +54,7 @@ class LocalChat:
         return self.model_name
 
     @staticmethod
-    def _convert_langchainschema_to_dict(messages: List[ChatMessage]) -> List[dict]:
+    def _convert_langchainschema_to_dict(messages: list[ChatMessage]) -> list[dict]:
         """Converts list of chat messages in langchain.schema format to list of dict."""
         return [
             {"role": message.role, "content": message.content} for message in messages
@@ -82,7 +80,7 @@ class LocalChatOpenAI:
             **kwargs,
         )
 
-    def __call__(self, messages: List[ChatMessage], *args: Any, **kwds: Any) -> dict:
+    def __call__(self, messages: list[ChatMessage], *args: Any, **kwds: Any) -> dict:
         return self.llm.invoke(messages)
 
     def __str__(self):

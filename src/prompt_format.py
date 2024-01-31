@@ -1,6 +1,3 @@
-from typing import List, Dict
-
-
 class PromptFormat:
     B_INST = ""
     E_INST = ""
@@ -13,7 +10,7 @@ class PromptFormat:
         "Always answer as helpfully as possible, while being safe."
     )
 
-    def get_prompt(self, messages: List[Dict[str, str]]) -> str:
+    def get_prompt(self, messages: list[dict[str, str]]) -> str:
         """Converts messages to compliant prompt format."""
         # if messages are in langchain.schema, convert to dict
         if messages[0]["role"] != "system":
@@ -23,7 +20,8 @@ class PromptFormat:
             messages = messages[1:]
 
         chat_history = [
-            (prompt["content"], answer["content"]) for prompt, answer in zip(messages[::2], messages[1::2])
+            (prompt["content"], answer["content"])
+            for prompt, answer in zip(messages[::2], messages[1::2])
         ]
 
         user_prompt = messages[-1]["content"]
