@@ -8,7 +8,7 @@ from src import CFG
 from streamlit_app import get_http_status
 from streamlit_app.utils import set_container_width
 
-API_URL = f"http://{CFG.HOST}:{CFG.PORT_LLAVA}"
+API_URL = f"http://{CFG.HOST}:{CFG.PORT.LLAVA}"
 
 # sliding window of the most recent interactions
 MEMORY_BUFFER_WINDOW = 6

@@ -21,4 +21,4 @@ async def get_response(request: Request) -> dict:
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=CFG.HOST, port=CFG.PORT_LLAVA)
+    uvicorn.run(app, host=CFG.HOST, port=CFG.PORT.LLAVA)

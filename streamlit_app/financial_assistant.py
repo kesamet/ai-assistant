@@ -1,26 +1,22 @@
-import logging
-import os
 from typing import List
 
 import fitz
 import streamlit as st
-from dotenv import load_dotenv
-from glob import glob
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema import Document
+from langchain.chains import ConversationalRetrievalChain
+from langchain.prompts import ChatPromptTemplate, PromptTemplate
+from langchain.schema import Document, HumanMessage, AIMessage
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.vectorstores.faiss import FAISS
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_google_genai import (
+    ChatGoogleGenerativeAI,
+    GoogleGenerativeAIEmbeddings,
+    GoogleGenerativeAI,
+)
 
-from streamlit_app.utils import get_pdf_display
+from src import logger
 
-logging.basicConfig(level=logging.INFO)
-
-_ = load_dotenv()
-
-LLM = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.0)
 EMBEDDINGS = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 
 METRICS = [
@@ -59,13 +55,13 @@ def extract_tables(filename: str) -> List[Document]:
     table_docs = list()
     for page in pdf_file:
         tabs = page.find_tables()
-        logging.info(f"[+] Found {len(tabs.tables)} table(s) on page {page.number}")
+        logger.info(f"[+] Found {len(tabs.tables)} table(s) on page {page.number}")
 
         for tab in tabs:
             try:
                 df = tab.to_pandas()
                 if df.shape == (1, 1):
-                    logging.info("  [!] dataframe shape is (1, 1)")
+                    logger.info("  [!] dataframe shape is (1, 1)")
                     continue
                 d = Document(
                     page_content=df.to_json(),
@@ -73,27 +69,25 @@ def extract_tables(filename: str) -> List[Document]:
                 )
                 table_docs.append(d)
             except Exception:
-                logging.info("  [!] unable to convert to dataframe")
+                logger.info("  [!] unable to convert to dataframe")
     return table_docs
 
 
 @st.cache_data
-def extract_metrics(filename):
-    content_db = _get_content_db(filename)
-    content_retriever = content_db.as_retriever()
+def extract_metrics(_retriever, _tables_db):
+    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.0)
 
     content_template = """Based only on the following context, answer the question in a sentence:
 Context: {context}
 Question: {question}"""
     content_chain = (
-        {"context": content_retriever, "question": RunnablePassthrough()}
+        {"context": _retriever, "question": RunnablePassthrough()}
         | ChatPromptTemplate.from_template(content_template)
-        | LLM
+        | model
         | StrOutputParser()
     )
 
-    tables_db = _get_tables_db(filename)
-    tables_retriever = tables_db.as_retriever()
+    tables_retriever = _tables_db.as_retriever()
 
     table_prompt = """Using the following tables, answer the question in a sentence:
 Tables: {context}
@@ -101,7 +95,7 @@ Question: {question}"""
     table_chain = (
         {"context": tables_retriever, "question": RunnablePassthrough()}
         | ChatPromptTemplate.from_template(table_prompt)
-        | LLM
+        | model
         | StrOutputParser()
     )
 
@@ -114,7 +108,7 @@ Final answer:"""
     chain = (
         {"content_answer": content_chain, "table_answer": table_chain}
         | ChatPromptTemplate.from_template(summarise_prompt)
-        | LLM
+        | model
         | StrOutputParser()
     )
 
@@ -126,26 +120,78 @@ Final answer:"""
     return results
 
 
+def build_retrieval_chain(retriever):
+    condense_question_template = """Given the following conversation and a follow up question, \
+rephrase the follow up question to be a standalone question, in its original language.
+
+Chat History:
+{chat_history}
+Follow Up Input: {question}
+Standalone question:"""
+
+    retrieval_chain = ConversationalRetrievalChain.from_llm(
+        llm=GoogleGenerativeAI(model="gemini-pro", temperature=0.0),
+        chain_type="stuff",
+        retriever=retriever,
+        return_source_documents=True,
+        # combine_docs_chain_kwargs={"prompt": PromptTemplate.from_template(QA_TEMPLATE)},
+        condense_question_prompt=PromptTemplate.from_template(
+            condense_question_template
+        ),
+    )
+    return retrieval_chain
+
+
+def init_messages() -> None:
+    clear_button = st.sidebar.button("Clear Conversation", key="chatbot")
+    if clear_button or "fc_messages" not in st.session_state:
+        st.session_state.fc_messages = []
+
+
 def financial_assistant():
-    st.title("Financial metrics")
+    st.title("Financial Assistant")
+    # st.info("This app extracts predefined metrics from financial reports.")
 
-    c0, c1 = st.columns(2)
-    c0.info("This app extract predefined metrics from financial reports.")
-
-    report_dir = st.sidebar.text_input("Input report directory")
-    if report_dir == "":
+    filename = st.sidebar.text_input(
+        "Input file path", "/home/kokmeng/Desktop/reports/AA-2023Q4.pdf"
+    )
+    if filename == "":
         st.stop()
 
-    filenames = sorted(glob(os.path.join(report_dir, "*.pdf")))
-    with c0.form("metrics"):
-        filename = st.selectbox("Select file", filenames)
+    content_db = _get_content_db(filename)
+    content_retriever = content_db.as_retriever()
+    retrieval_chain = build_retrieval_chain(content_retriever)
 
+    tables_db = _get_tables_db(filename)
+
+    with st.sidebar.form("metrics"):
+        st.write("Retrieve metrics")
         submitted = st.form_submit_button("Submit")
         if submitted:
-            st.session_state.fc_messages = extract_metrics(filename)
+            _ = extract_metrics(content_retriever, tables_db)
 
-    with c1:
-        st.markdown(
-            get_pdf_display(open(filename, "rb").read()),
-            unsafe_allow_html=True,
+    init_messages()
+
+    for message in st.session_state.fc_messages:
+        if isinstance(message, HumanMessage):
+            with st.chat_message("user"):
+                st.markdown(message.content)
+        elif isinstance(message, AIMessage):
+            with st.chat_message("assistant"):
+                st.markdown(message.content)
+
+    if user_query := st.chat_input("Your query"):
+        with st.chat_message("user"):
+            st.markdown(user_query)
+
+        response = retrieval_chain.invoke(
+            {
+                "question": user_query,
+                "chat_history": st.session_state.fc_messages,
+            },
         )
+        with st.chat_message("assistant"):
+            st.markdown(response["answer"])
+
+        st.session_state.fc_messages.append(HumanMessage(content=user_query))
+        st.session_state.fc_messages.append(AIMessage(content=response["answer"]))
