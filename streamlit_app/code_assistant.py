@@ -6,7 +6,7 @@ from langchain.schema import HumanMessage, AIMessage
 from src import CFG
 from streamlit_app import get_http_status
 
-API_URL = f"http://{CFG.HOST}:{CFG.PORT_CODELLAMA}"
+API_URL = f"http://{CFG.HOST}:{CFG.PORT.CODELLAMA}"
 
 
 def init_messages() -> None:

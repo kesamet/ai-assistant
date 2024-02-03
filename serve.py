@@ -95,19 +95,19 @@ if __name__ == "__main__":
         model_path = f"{CFG.MODELS_DIR}/{CFG.LLAMA2.MODEL_PATH}"
         model_type = CFG.LLAMA2.MODEL_TYPE
         PROMPT_FORMAT = Llama2Format()
-        port = CFG.PORT_LLAMA2
+        port = CFG.PORT.LLAMA2
     elif args.model == "codellama":
         MODEL_NAME = CFG.CODELLAMA.MODEL_NAME
         model_path = f"{CFG.MODELS_DIR}/{CFG.CODELLAMA.MODEL_PATH}"
         model_type = CFG.CODELLAMA.MODEL_TYPE
         PROMPT_FORMAT = CodeLlamaFormat()
-        port = CFG.PORT_CODELLAMA
+        port = CFG.PORT.CODELLAMA
     elif args.model == "mistral":
         MODEL_NAME = CFG.MISTRAL.MODEL_NAME
         model_path = f"{CFG.MODELS_DIR}/{CFG.MISTRAL.MODEL_PATH}"
         model_type = CFG.MISTRAL.MODEL_TYPE
         PROMPT_FORMAT = MistralFormat()
-        port = CFG.PORT_MISTRAL
+        port = CFG.PORT.MISTRAL
     else:
         raise NotImplementedError
 

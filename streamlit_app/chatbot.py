@@ -108,9 +108,9 @@ def select_llm():
     if model_name.startswith("gpt-"):
         return ChatOpenAI(temperature=CFG.LLM_CONFIG.TEMPERATURE, model_name=model_name)
     if model_name == "llama-2":
-        return LocalChat(model_name, f"http://{CFG.HOST}:{CFG.PORT_LLAMA2}")
+        return LocalChat(model_name, f"http://{CFG.HOST}:{CFG.PORT.LLAMA2}")
     if model_name == "mistral":
-        return LocalChat(model_name, f"http://{CFG.HOST}:{CFG.PORT_MISTRAL}")
+        return LocalChat(model_name, f"http://{CFG.HOST}:{CFG.PORT.MISTRAL}")
     if model_name == "llamacpp":
         return LocalChatOpenAI("http://localhost:8000/v1")
     raise NotImplementedError
