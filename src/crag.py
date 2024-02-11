@@ -34,8 +34,6 @@ class GraphState(TypedDict):
 
 
 ### Nodes ###
-
-
 def retrieve(state):
     """
     Retrieve documents
@@ -128,11 +126,13 @@ def grade_documents(state):
 
     # Prompt
     prompt = PromptTemplate(
-        template="""You are a grader assessing relevance of a retrieved document to a user question. \n 
-        Here is the retrieved document: \n\n {context} \n\n
-        Here is the user question: {question} \n
-        If the document contains keyword(s) or semantic meaning related to the user question, grade it as relevant. \n
-        Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question.""",
+        template=(
+            "You are a grader assessing relevance of a retrieved document to a user question. \n\n"
+            "Here is the retrieved document: \n\n {context} \n\n\n"
+            "Here is the user question: {question} \n\n"
+            "If the document contains keyword(s) or semantic meaning related to the user question, grade it as relevant. \n\n"
+            "Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question."
+        ),
         input_variables=["context", "question"],
     )
 
@@ -179,13 +179,15 @@ def transform_query(state):
 
     # Create a prompt template with format instructions and the query
     prompt = PromptTemplate(
-        template="""You are generating questions that is well optimized for retrieval. \n 
-        Look at the input and try to reason about the underlying sematic intent / meaning. \n 
-        Here is the initial question:
-        \n ------- \n
-        {question} 
-        \n ------- \n
-        Formulate an improved question: """,
+        template=(
+            "You are generating questions that is well optimized for retrieval. \n\n"
+            "Look at the input and try to reason about the underlying sematic intent / meaning. \n\n"
+            "Here is the initial question:\n"
+            "\n ------- \n\n"
+            "{question}\n"
+            "\n ------- \n\n"
+            "Formulate an improved question: "
+        ),
         input_variables=["question"],
     )
 
@@ -225,8 +227,6 @@ def web_search(state):
 
 
 ### Edges
-
-
 def decide_to_generate(state):
     """
     Determines whether to generate an answer or re-generate a question for web search.
