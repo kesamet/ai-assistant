@@ -1,6 +1,4 @@
-import json
-import operator
-from typing import Annotated, Dict, Sequence, TypedDict
+from typing import Dict, TypedDict
 
 
 import pprint
@@ -9,16 +7,16 @@ from langchain.output_parsers.openai_tools import PydanticToolsParser
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_community.vectorstores import Chroma
-from langchain_core.messages import BaseMessage, FunctionMessage
+# from langchain_community.vectorstores import Chroma
+# from langchain_core.messages import BaseMessage, FunctionMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
-from langchain_core.runnables import RunnablePassthrough
+# from langchain_core.runnables import RunnablePassthrough
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from langgraph.graph import END, StateGraph
-
 # from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI
+# from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 vectorstore = ...
 retriever = vectorstore.as_retriever()
@@ -74,7 +72,7 @@ def generate(state):
     prompt = hub.pull("rlm/rag-prompt")
 
     # LLM
-    #     llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, streaming=True)
+    # llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, streaming=True)
     llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0, streaming=True)
 
     # Post-processing
@@ -101,7 +99,6 @@ def grade_documents(state):
     Returns:
         state (dict): Updates documents key with relevant documents
     """
-
     print("---CHECK RELEVANCE---")
     state_dict = state["keys"]
     question = state_dict["question"]
@@ -114,7 +111,7 @@ def grade_documents(state):
         binary_score: str = Field(description="Relevance score 'yes' or 'no'")
 
     # LLM
-    #     model = ChatOpenAI(temperature=0, model="gpt-4-0125-preview", streaming=True)
+    # model = ChatOpenAI(temperature=0, model="gpt-4-0125-preview", streaming=True)
     model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0, streaming=True)
 
     # Tool
@@ -175,7 +172,6 @@ def transform_query(state):
     Returns:
         state (dict): Updates question key with a re-phrased question
     """
-
     print("---TRANSFORM QUERY---")
     state_dict = state["keys"]
     question = state_dict["question"]
@@ -194,7 +190,7 @@ def transform_query(state):
     )
 
     # Grader
-    #     model = ChatOpenAI(temperature=0, model="gpt-4-0125-preview", streaming=True)
+    # model = ChatOpenAI(temperature=0, model="gpt-4-0125-preview", streaming=True)
     model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0, streaming=True)
 
     # Prompt
@@ -214,7 +210,6 @@ def web_search(state):
     Returns:
         state (dict): Updates documents key with appended web results
     """
-
     print("---WEB SEARCH---")
     state_dict = state["keys"]
     question = state_dict["question"]
@@ -242,11 +237,10 @@ def decide_to_generate(state):
     Returns:
         str: Next node to call
     """
-
     print("---DECIDE TO GENERATE---")
     state_dict = state["keys"]
-    question = state_dict["question"]
-    filtered_documents = state_dict["documents"]
+    # question = state_dict["question"]
+    # filtered_documents = state_dict["documents"]
     search = state_dict["run_web_search"]
 
     if search == "Yes":
