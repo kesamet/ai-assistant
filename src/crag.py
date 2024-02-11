@@ -33,7 +33,6 @@ class GraphState(TypedDict):
     keys: Dict[str, any]
 
 
-### Nodes ###
 def retrieve(state):
     """
     Retrieve documents
@@ -130,7 +129,8 @@ def grade_documents(state):
             "You are a grader assessing relevance of a retrieved document to a user question. \n\n"
             "Here is the retrieved document: \n\n {context} \n\n\n"
             "Here is the user question: {question} \n\n"
-            "If the document contains keyword(s) or semantic meaning related to the user question, grade it as relevant. \n\n"
+            "If the document contains keyword(s) or semantic meaning related to the user question, "
+            "grade it as relevant. \n\n"
             "Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question."
         ),
         input_variables=["context", "question"],
@@ -226,10 +226,10 @@ def web_search(state):
     return {"keys": {"documents": documents, "question": question}}
 
 
-### Edges
 def decide_to_generate(state):
     """
     Determines whether to generate an answer or re-generate a question for web search.
+    It is used in a conditional edge
 
     Args:
         state (dict): The current state of the agent, including all keys.
