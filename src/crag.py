@@ -1,25 +1,17 @@
 from typing import Dict, TypedDict
 
-
 import pprint
-from langchain import hub
-from langchain.output_parsers.openai_tools import PydanticToolsParser
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
 from langchain_community.tools.tavily_search import TavilySearchResults
-# from langchain_community.vectorstores import Chroma
-# from langchain_core.messages import BaseMessage, FunctionMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field
-# from langchain_core.runnables import RunnablePassthrough
-from langchain_core.utils.function_calling import convert_to_openai_tool
 from langgraph.graph import END, StateGraph
-# from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
-# from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 vectorstore = ...
-retriever = vectorstore.as_retriever()
+RETRIEVER = vectorstore.as_retriever(search_kwargs={"k": 2})
+QA_PROMPT = ...
+LLM = ...
 
 
 class GraphState(TypedDict):
@@ -46,7 +38,7 @@ def retrieve(state):
     print("---RETRIEVE---")
     state_dict = state["keys"]
     question = state_dict["question"]
-    documents = retriever.get_relevant_documents(question)
+    documents = RETRIEVER.get_relevant_documents(question)
     return {"keys": {"documents": documents, "question": question}}
 
 
@@ -65,21 +57,9 @@ def generate(state):
     question = state_dict["question"]
     documents = state_dict["documents"]
 
-    # Prompt
-    prompt = hub.pull("rlm/rag-prompt")
+    # RAG chain
+    rag_chain = QA_PROMPT | LLM | StrOutputParser()
 
-    # LLM
-    # llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, streaming=True)
-    llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0, streaming=True)
-
-    # Post-processing
-    def format_docs(docs):
-        return "\n\n".join(doc.page_content for doc in docs)
-
-    # Chain
-    rag_chain = prompt | llm | StrOutputParser()
-
-    # Run
     generation = rag_chain.invoke({"context": documents, "question": question})
     return {
         "keys": {"documents": documents, "question": question, "generation": generation}
@@ -101,29 +81,6 @@ def grade_documents(state):
     question = state_dict["question"]
     documents = state_dict["documents"]
 
-    # Data model
-    class grade(BaseModel):
-        """Binary score for relevance check."""
-
-        binary_score: str = Field(description="Relevance score 'yes' or 'no'")
-
-    # LLM
-    # model = ChatOpenAI(temperature=0, model="gpt-4-0125-preview", streaming=True)
-    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0, streaming=True)
-
-    # Tool
-    grade_tool_oai = convert_to_openai_tool(grade)
-
-    # LLM with tool and enforce invocation
-    llm_with_tool = model.bind(
-        tools=[convert_to_openai_tool(grade_tool_oai)],
-        tool_choice={"type": "function", "function": {"name": "grade"}},
-    )
-
-    # Parser
-    parser_tool = PydanticToolsParser(tools=[grade])
-
-    # Prompt
     prompt = PromptTemplate(
         template=(
             "You are a grader assessing relevance of a retrieved document to a user question. \n\n"
@@ -136,15 +93,15 @@ def grade_documents(state):
         input_variables=["context", "question"],
     )
 
-    # Chain
-    chain = prompt | llm_with_tool | parser_tool
+    # Grader
+    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0, streaming=False)
+    chain = prompt | model | StrOutputParser()
 
     # Score
     filtered_docs = []
     search = "No"  # Default do not opt for web search to supplement retrieval
     for d in documents:
-        score = chain.invoke({"question": question, "context": d.page_content})
-        grade = score[0].binary_score
+        grade = chain.invoke({"question": question, "context": d.page_content})
         if grade == "yes":
             print("---GRADE: DOCUMENT RELEVANT---")
             filtered_docs.append(d)
@@ -191,11 +148,8 @@ def transform_query(state):
         input_variables=["question"],
     )
 
-    # Grader
-    # model = ChatOpenAI(temperature=0, model="gpt-4-0125-preview", streaming=True)
-    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0, streaming=True)
-
-    # Prompt
+    # Transform chain
+    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0, streaming=False)
     chain = prompt | model | StrOutputParser()
     better_question = chain.invoke({"question": question})
 
@@ -239,8 +193,6 @@ def decide_to_generate(state):
     """
     print("---DECIDE TO GENERATE---")
     state_dict = state["keys"]
-    # question = state_dict["question"]
-    # filtered_documents = state_dict["documents"]
     search = state_dict["run_web_search"]
 
     if search == "Yes":
@@ -254,32 +206,35 @@ def decide_to_generate(state):
         return "generate"
 
 
-workflow = StateGraph(GraphState)
+def build_graph():
+    """Build graph."""
+    workflow = StateGraph(GraphState)
 
-# Define the nodes
-workflow.add_node("retrieve", retrieve)  # retrieve
-workflow.add_node("grade_documents", grade_documents)  # grade documents
-workflow.add_node("generate", generate)  # generate
-workflow.add_node("transform_query", transform_query)  # transform_query
-workflow.add_node("web_search", web_search)  # web search
+    # Define the nodes
+    workflow.add_node("retrieve", retrieve)  # retrieve
+    workflow.add_node("grade_documents", grade_documents)  # grade documents
+    workflow.add_node("generate", generate)  # generate
+    workflow.add_node("transform_query", transform_query)  # transform_query
+    workflow.add_node("web_search", web_search)  # web search
 
-# Build graph
-workflow.set_entry_point("retrieve")
-workflow.add_edge("retrieve", "grade_documents")
-workflow.add_conditional_edges(
-    "grade_documents",
-    decide_to_generate,
-    {
-        "transform_query": "transform_query",
-        "generate": "generate",
-    },
-)
-workflow.add_edge("transform_query", "web_search")
-workflow.add_edge("web_search", "generate")
-workflow.add_edge("generate", END)
+    # Build graph
+    workflow.set_entry_point("retrieve")
+    workflow.add_edge("retrieve", "grade_documents")
+    workflow.add_conditional_edges(
+        "grade_documents",
+        decide_to_generate,
+        {
+            "transform_query": "transform_query",
+            "generate": "generate",
+        },
+    )
+    workflow.add_edge("transform_query", "web_search")
+    workflow.add_edge("web_search", "generate")
+    workflow.add_edge("generate", END)
 
-# Compile
-app = workflow.compile()
+    # Compile
+    app = workflow.compile()
+    return app
 
 
 # Run
