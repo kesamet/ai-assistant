@@ -8,6 +8,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolInvocation, ToolExecutor
 
+# Tool template: see https://api.python.langchain.com/en/latest/_modules/langchain_community/tools/tavily_search/tool.html
 tools = [TavilySearchResults(max_results=1)]
 tool_executor = ToolExecutor(tools)
 
