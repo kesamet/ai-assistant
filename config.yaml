@@ -5,17 +5,14 @@ MODELS_DIR: ./models
 LLAMA2:
   MODEL_NAME: llama-2-7b-chat
   MODEL_PATH: llama-2-7b-chat.Q4_K_M.gguf
-  MODEL_TYPE: llama
 
 CODELLAMA:
   MODEL_NAME: codellama-7b-instruct
   MODEL_PATH: codellama-7b-instruct.Q2_K.gguf
-  MODEL_TYPE: llama
 
 MISTRAL:
   MODEL_NAME: mistral-7b-instruct-v0.2
   MODEL_PATH: mistral-7b-instruct-v0.2.Q4_K_M.gguf
-  MODEL_TYPE: mistral
 
 LLM_CONFIG:
   MAX_NEW_TOKENS: 512
