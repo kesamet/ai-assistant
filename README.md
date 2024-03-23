@@ -5,8 +5,9 @@
 You will need to set up your development environment using conda, which you can install [directly](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html).
 
 ```bash
-conda env create --name assistant -f environment.yaml --force
+conda env create --name assistant python=3.11
 conda activate assistant
+pip install -r requirements.txt
 ```
 
 
