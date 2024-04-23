@@ -28,7 +28,7 @@ streamlit run app.py
 ![screenshot](./assets/screenshot.png)
 
 
-## 💻 AI Agents App
+## 💻 ReAct Agent App
 
 We shall also use Google, SERP API, News API and Wolfram Alpha. As such, the following API keys are required:
 - Google: `GOOGLE_API_KEY`
@@ -37,7 +37,7 @@ We shall also use Google, SERP API, News API and Wolfram Alpha. As such, the fol
 - Wolfram Alpha: `WOLFRAM_ALPHA_APPID`
 Save these keys in `.env`.
 
-Run Streamlit app and select `AI Agents`.
+Run Streamlit app and select `ReAct Agent`.
 ```bash
 streamlit run app.py
 ```

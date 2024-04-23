@@ -1,6 +1,7 @@
 """
 Utility functions for Streamlit app.
 """
+
 import base64
 import json
 import pickle
