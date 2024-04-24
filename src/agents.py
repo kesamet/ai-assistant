@@ -25,7 +25,7 @@ def create_react_agent(
     stop_sequence: Union[bool, List[str]] = True,
 ) -> Runnable:
     """Create an agent that uses ReAct prompting.
-    Adapted from https://api.python.langchain.com/en/latest/_modules/langchain/agents/react/agent.html#create_react_agent
+    (https://api.python.langchain.com/en/latest/_modules/langchain/agents/react/agent.html#create_react_agent)
 
     Args:
         llm: LLM to use as the agent.
