@@ -11,7 +11,6 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from src.agents import create_gemini_functions_agent
-from src.general import setup_tracing
 from src.tools import (
     tavily_tool,
     wikipedia_tool,
@@ -49,18 +48,9 @@ class AgentInput(BaseModel):
     )
 
 
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True).with_types(
-    input_type=AgentInput
-)
-
-
-def _setup_tracing():
-    success, e = setup_tracing()
-    if not success:
-        st.sidebar.error(f"Tracing with Phoenix app not available: {e}")
-        st.sidebar.info("To start the app, run `python3 -m phoenix.server.main serve`")
-    else:
-        st.sidebar.info("View traces with [Phoenix app](http://localhost:6006/)")
+agent_executor = AgentExecutor(
+    agent=agent, tools=tools, max_execution_time=60, verbose=True
+).with_types(input_type=AgentInput)
 
 
 def init_messages() -> None:
@@ -80,7 +70,6 @@ def get_response(user_input: str, chat_history: List[Tuple[str, str]]) -> str:
 
 def agent_gemini_functions():
     st.sidebar.title("Gemini Functions Agent")
-    _setup_tracing()
 
     init_messages()
 

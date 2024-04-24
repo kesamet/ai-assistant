@@ -4,7 +4,6 @@ from langchain.agents import AgentExecutor
 from langchain_google_genai import GoogleGenerativeAI
 
 from src.agents import create_react_agent
-from src.general import setup_tracing
 from src.tools import (
     tavily_tool,
     wikipedia_tool,
@@ -59,17 +58,12 @@ agent = create_react_agent(
     stop_sequence=True,
 )
 agent_executor = AgentExecutor(
-    agent=agent, tools=tools, return_intermediate_steps=True, verbose=True
+    agent=agent,
+    tools=tools,
+    return_intermediate_steps=True,
+    max_execution_time=60,
+    verbose=True,
 )
-
-
-def _setup_tracing():
-    success, e = setup_tracing()
-    if not success:
-        st.sidebar.error(f"Tracing with Phoenix app not available: {e}")
-        st.sidebar.info("To start the app, run `python3 -m phoenix.server.main serve`")
-    else:
-        st.sidebar.info("View traces with [Phoenix app](http://localhost:6006/)")
 
 
 def init_messages() -> None:
@@ -91,7 +85,6 @@ def agent_react():
         "ReAct Agent is powered by gemini-pro and has access to Tavily, Wikipedia, "
         "News API, Wolfram and calculator tools."
     )
-    _setup_tracing()
 
     init_messages()
 
