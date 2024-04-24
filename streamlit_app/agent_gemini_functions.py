@@ -1,5 +1,6 @@
 """
-Adapted from https://github.com/langchain-ai/langchain/blob/master/templates/gemini-functions-agent/gemini_functions_agent/agent.py
+Adapted from
+https://github.com/langchain-ai/langchain/blob/master/templates/gemini-functions-agent/gemini_functions_agent/agent.py
 """
 
 from typing import List, Tuple
