@@ -10,6 +10,14 @@ conda activate assistant
 pip install -r requirements.txt
 ```
 
+### Tracing
+
+We shall use [Phoenix](https://docs.arize.com/phoenix) for LLM tracing. Phoenix is an open-source observability library designed for experimentation, evaluation, and troubleshooting. Before running the app, start a phoenix server
+
+```bash
+python3 -m phoenix.server.main serve
+```
+
 
 ## 💻 Vision Assistant App
 
@@ -28,16 +36,15 @@ streamlit run app.py
 ![screenshot](./assets/screenshot.png)
 
 
-## 💻 AI Agents App
+## 💻 ReAct Agent App
 
-We shall also use Google, SERP API, News API and Wolfram Alpha. As such, the following API keys are required:
-- Google: `GOOGLE_API_KEY`
-- SERP API: `SERPAPI_API_KEY`
+This app demostrates using an agent to implement the ReAct logic. We shall use tools like Tavily, Wikipedia, News API and Wolfram Alpha. As such, the following API keys are required:
+- Tavily: `TAVILY_API_KEY`
 - News API: `NEWSAPI_API_KEY`
 - Wolfram Alpha: `WOLFRAM_ALPHA_APPID`
 Save these keys in `.env`.
 
-Run Streamlit app and select `AI Agents`.
+Run Streamlit app and select `ReAct Agent`.
 ```bash
 streamlit run app.py
 ```
