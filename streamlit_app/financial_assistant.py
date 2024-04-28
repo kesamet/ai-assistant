@@ -2,7 +2,7 @@ from typing import List
 
 import fitz
 import streamlit as st
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
 from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain.schema import Document, HumanMessage, AIMessage
 from langchain.schema.output_parser import StrOutputParser
