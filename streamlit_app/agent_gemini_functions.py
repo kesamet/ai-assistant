@@ -15,7 +15,6 @@ from src.agents import create_gemini_functions_agent
 from src.tools import (
     tavily_tool,
     wikipedia_tool,
-    calculator_tool,
     newsapi_tool,
     wolfram_tool,
     get_stock_price_history,
@@ -25,7 +24,6 @@ from src.tools import (
 tools = [
     tavily_tool,
     wikipedia_tool,
-    calculator_tool,
     newsapi_tool,
     wolfram_tool,
     get_stock_price_history,
@@ -92,7 +90,7 @@ def agent_gemini_functions():
         with st.chat_message("assistant"):
             with st.spinner("Thinking ..."):
                 output = get_response(user_input, st.session_state.gf_messages)
-            output = output.replace("$", "\$")
+            output = output.replace("$", r"\$")
             st.markdown(output, unsafe_allow_html=True)
 
         st.session_state.gf_messages.append((user_input, output))

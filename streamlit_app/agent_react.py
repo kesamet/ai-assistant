@@ -32,7 +32,8 @@ llm = GoogleGenerativeAI(
     max_tokens=512,
 )
 
-template = """Answer the following questions as best you can. You have access to the following tools:
+template = """Answer the following questions as best you can. \
+You have access to the following tools:
 
 {tools}
 
@@ -106,7 +107,7 @@ def agent_react():
         with st.chat_message("assistant"):
             with st.spinner("Thinking ..."):
                 response = get_response(user_input)
-            output = response["output"].replace("$", "\$")
+            output = response["output"].replace("$", r"\$")
             st.markdown(response["output"])
 
             with st.expander("Thoughts and Actions"):

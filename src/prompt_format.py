@@ -30,7 +30,8 @@ class PromptFormat:
     def _format(
         self, message: str, chat_history: list[tuple[str, str]], system_prompt: str
     ) -> str:
-        """Copied from https://huggingface.co/spaces/codellama/codellama-13b-chat/blob/main/model.py#L25-L36."""
+        """Copied from https://huggingface.co/spaces/codellama/codellama-13b-chat
+        /blob/main/model.py#L25-L36."""
         texts = [f"{self.BOS}{self.B_INST} {self.B_SYS}{system_prompt}{self.E_SYS}"]
         # The first user input is _not_ stripped
         do_strip = False

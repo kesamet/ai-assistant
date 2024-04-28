@@ -163,7 +163,8 @@ def get_stock_quantstats(symbol: str) -> str:
 
 # @tool(args_schema=StockStatsInput)
 # def get_stock_profile(symbol: str) -> str:
-#     """Fetch a Company's General Information By Symbol. This includes company name, industry, and sector data."""
+#     """Fetch a Company's General Information By Symbol.
+#     This includes company name, industry, and sector data."""
 
 #     stock = Stock(symbol)
 #     try:

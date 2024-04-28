@@ -38,7 +38,10 @@ _wolfram = WolframAlphaAPIWrapper()
 wolfram_tool = Tool(
     name="WolframAlpha",
     func=_wolfram.run,
-    description="A useful tool for answering complex questions about math, such as solving equations.",
+    description=(
+        "A useful tool for answering complex questions about math, "
+        "such as solving equations."
+    ),
 )
 
 # NewsAPI Tool
