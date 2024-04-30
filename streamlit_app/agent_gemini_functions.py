@@ -15,18 +15,19 @@ from src.agents import create_gemini_functions_agent
 from src.tools import (
     tavily_tool,
     wikipedia_tool,
-    calculator_tool,
     newsapi_tool,
     wolfram_tool,
+    get_stock_price_history,
+    get_stock_quantstats,
 )
 
-# Define agent
 tools = [
     tavily_tool,
     wikipedia_tool,
-    calculator_tool,
     newsapi_tool,
     wolfram_tool,
+    get_stock_price_history,
+    get_stock_quantstats,
 ]
 
 llm = ChatGoogleGenerativeAI(temperature=0, model="gemini-pro")
@@ -67,6 +68,7 @@ def get_response(user_input: str, chat_history: List[Tuple[str, str]]) -> str:
         )["output"]
     except Exception as e:
         st.error(e)
+        return ""
 
 
 def agent_gemini_functions():
@@ -87,7 +89,8 @@ def agent_gemini_functions():
 
         with st.chat_message("assistant"):
             with st.spinner("Thinking ..."):
-                response = get_response(user_input, st.session_state.gf_messages)
-            st.markdown(response)
+                output = get_response(user_input, st.session_state.gf_messages)
+            output = output.replace("$", r"\$")
+            st.markdown(output, unsafe_allow_html=True)
 
-        st.session_state.gf_messages.append((user_input, response))
+        st.session_state.gf_messages.append((user_input, output))

@@ -38,7 +38,8 @@ streamlit run app.py
 
 ## 💻 ReAct Agent App
 
-This app demostrates using an agent to implement the ReAct logic. We shall use tools like Tavily, Wikipedia, News API and Wolfram Alpha. As such, the following API keys are required:
+This app demostrates using agent to implement the ReAct logic. We shall use tools like Tavily, Wikipedia, News API and Wolfram Alpha. The LLM is Gemini-Pro. The following API keys are required:
+- Google: `GOOGLE_API_KEY`
 - Tavily: `TAVILY_API_KEY`
 - News API: `NEWSAPI_API_KEY`
 - Wolfram Alpha: `WOLFRAM_ALPHA_APPID`

@@ -86,7 +86,8 @@ def create_react_agent(
 
             from langchain_core.prompts import PromptTemplate
 
-            template = '''Answer the following questions as best you can. You have access to the following tools:
+            template = '''Answer the following questions as best you can. \
+            You have access to the following tools:
 
             {tools}
 

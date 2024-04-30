@@ -10,15 +10,8 @@ from src.tools import (
     calculator_tool,
     newsapi_tool,
     wolfram_tool,
-)
-
-# Define agent
-model = GoogleGenerativeAI(
-    model="gemini-pro",
-    convert_system_message_to_human=True,
-    handle_parsing_errors=True,
-    temperature=0.2,
-    max_tokens=512,
+    get_stock_price_history,
+    get_stock_quantstats,
 )
 
 tools = [
@@ -27,9 +20,20 @@ tools = [
     calculator_tool,
     newsapi_tool,
     wolfram_tool,
+    get_stock_price_history,
+    get_stock_quantstats,
 ]
 
-template = """Answer the following questions as best you can. You have access to the following tools:
+llm = GoogleGenerativeAI(
+    model="gemini-pro",
+    convert_system_message_to_human=True,
+    handle_parsing_errors=True,
+    temperature=0.2,
+    max_tokens=512,
+)
+
+template = """Answer the following questions as best you can. \
+You have access to the following tools:
 
 {tools}
 
@@ -52,7 +56,7 @@ Thought:{agent_scratchpad}"""
 prompt = PromptTemplate.from_template(template)
 
 agent = create_react_agent(
-    llm=model,
+    llm=llm,
     tools=tools,
     prompt=prompt,
     stop_sequence=True,
@@ -77,6 +81,7 @@ def get_response(user_input: str) -> str:
         return agent_executor.invoke({"input": user_input})
     except Exception as e:
         st.error(e)
+        return ""
 
 
 def agent_react():
@@ -102,11 +107,13 @@ def agent_react():
         with st.chat_message("assistant"):
             with st.spinner("Thinking ..."):
                 response = get_response(user_input)
+            output = response["output"].replace("$", r"\$")
             st.markdown(response["output"])
-            st.markdown("**Sources**")
-            for action, content in response["intermediate_steps"]:
-                st.markdown(f"`{action.log}`")
-                st.markdown(content)
-                st.markdown("---")
 
-        st.session_state.react_messages.append((user_input, response["output"]))
+            with st.expander("Thoughts and Actions"):
+                for action, content in response["intermediate_steps"]:
+                    st.markdown(f"`{action.log}`")
+                    st.markdown(content)
+                    st.markdown("---")
+
+        st.session_state.react_messages.append((user_input, output))

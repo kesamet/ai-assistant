@@ -1,21 +1,12 @@
-from typing import Optional, Type
-
-from pydantic import BaseModel, Field
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForToolRun,
-    CallbackManagerForToolRun,
-)
-from langchain.chains import llm_math
-from langchain.schema import StrOutputParser
-from langchain.tools import BaseTool, Tool
+from langchain.tools import Tool
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_community.utilities.tavily_search import TavilySearchAPIWrapper
 from langchain_community.utilities.wikipedia import WikipediaAPIWrapper
 from langchain_community.utilities.wolfram_alpha import WolframAlphaAPIWrapper
 from langchain_google_genai import GoogleGenerativeAI
 
-from .newsapi import NewsAPITool
-from .yahoo_finance import YahooFinanceTool
+from .newsapi_tool import NewsAPITool
+from .calculator_tool import CalculatorTool
 
 llm = GoogleGenerativeAI(model="gemini-pro", temperature=0.0)
 
@@ -47,39 +38,14 @@ _wolfram = WolframAlphaAPIWrapper()
 wolfram_tool = Tool(
     name="WolframAlpha",
     func=_wolfram.run,
-    description="A useful tool for answering complex questions about math, such as solving equations.",
+    description=(
+        "A useful tool for answering complex questions about math, "
+        "such as solving equations."
+    ),
 )
 
 # NewsAPI Tool
 newsapi_tool = NewsAPITool()
 
-# YahooFinance Tool
-yahoo_finance_tool = YahooFinanceTool()
-
 # Calculator Tool
-_MATH_CHAIN = llm_math.prompt.PROMPT | llm | StrOutputParser()
-
-
-class CalculatorInput(BaseModel):
-    question: str = Field()
-
-
-class CustomCalculatorTool(BaseTool):
-    name = "Calculator"
-    description = "A useful tool for answering simple questions about math."
-    args_schema: Type[BaseModel] = CalculatorInput
-
-    def _run(
-        self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
-    ) -> str:
-        """Use the tool."""
-        return _MATH_CHAIN.invoke({"question": query})
-
-    async def _arun(
-        self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
-    ) -> str:
-        """Use the tool asynchronously."""
-        raise _MATH_CHAIN.ainvoke({"question": query})
-
-
-calculator_tool = CustomCalculatorTool()
+calculator_tool = CalculatorTool.from_llm(llm)
