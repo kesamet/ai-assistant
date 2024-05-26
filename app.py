@@ -7,8 +7,6 @@ from streamlit_app.code_assistant import code_assistant
 from streamlit_app.vision_assistant import vision_assistant
 # from phoenix.trace.langchain import LangChainInstrumentor
 
-# from streamlit_app.financial_assistant import financial_assistant
-
 # Setup tracing
 # LangChainInstrumentor().instrument()
 
@@ -19,7 +17,6 @@ def main():
     dict_pages = {
         "ReAct Agent": agent_react,
         "Gemini Functions Agent": agent_gemini_functions,
-        # "Financial Assistant": financial_assistant,
         "Chatbot Playground": chatbot,
         "Vision Assistant": vision_assistant,
         "Code Assistant": code_assistant,

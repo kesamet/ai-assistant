@@ -3,11 +3,11 @@ from typing import Any, Optional, Type
 from pydantic import BaseModel, Field
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
+from langchain_core.runnables import Runnable
 from langchain.callbacks.manager import (
     AsyncCallbackManagerForToolRun,
     CallbackManagerForToolRun,
 )
-from langchain.chains.llm import LLMChain
 from langchain.chains.llm_math.prompt import PROMPT
 from langchain.tools import BaseTool
 
@@ -20,7 +20,7 @@ class CalculatorTool(BaseTool):
     name = "Calculator"
     description = "A useful tool for answering simple questions about math."
     args_schema: Type[BaseModel] = CalculatorInput
-    llm_chain: LLMChain
+    llm_chain: Runnable
 
     def _run(
         self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
@@ -40,8 +40,8 @@ class CalculatorTool(BaseTool):
         llm: BaseLanguageModel,
         prompt: BasePromptTemplate = PROMPT,
         **kwargs: Any,
-    ) -> LLMChain:
-        llm_chain = LLMChain(llm=llm, prompt=prompt)
+    ) -> Runnable:
+        llm_chain = prompt | llm
         return cls(llm_chain=llm_chain, **kwargs)
 
 

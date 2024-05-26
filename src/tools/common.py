@@ -11,7 +11,7 @@ from .calculator_tool import CalculatorTool
 llm = GoogleGenerativeAI(model="gemini-pro", temperature=0.0)
 
 # Web Search Tool
-search = TavilySearchAPIWrapper()
+_search = TavilySearchAPIWrapper()
 description = (
     "A search engine optimized for comprehensive, accurate, "
     "and trusted results. Useful for when you need to answer questions "
@@ -20,7 +20,7 @@ description = (
     "If the user is asking about something that you don't know about, "
     "you should probably use this tool to see if that can provide any information."
 )
-tavily_tool = TavilySearchResults(api_wrapper=search, description=description)
+tavily_tool = TavilySearchResults(api_wrapper=_search, description=description)
 
 # Wikipedia Tool
 _wikipedia = WikipediaAPIWrapper()
@@ -29,7 +29,8 @@ wikipedia_tool = Tool(
     func=_wikipedia.run,
     description=(
         "A wrapper around Wikipedia. Useful for when you need to answer general questions about "
-        "people, places, companies, facts, historical events, or other subjects."
+        "people, places, companies, facts, historical events, or other subjects. "
+        "Input should be a search query."
     ),
 )
 
