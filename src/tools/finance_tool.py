@@ -45,9 +45,7 @@ class Stock:
         df["atr"] = ta.volatility.AverageTrueRange(
             df["high"], df["low"], df["close"], window=14, fillna=fillna
         ).average_true_range()
-        df["rsi"] = ta.momentum.RSIIndicator(
-            df["close"], window=14, fillna=fillna
-        ).rsi()
+        df["rsi"] = ta.momentum.RSIIndicator(df["close"], window=14, fillna=fillna).rsi()
         df["52wk_high"] = df["close"].rolling(window=252).max()
         df["52wk_low"] = df["close"].rolling(window=252).min()
 
@@ -75,9 +73,7 @@ class Stock:
 
         stock_ret = qs.utils.download_returns(self.symbol, period=df.index)
         bench_ret = qs.utils.download_returns("^GSPC", period=df.index)
-        stats = qs.reports.metrics(
-            stock_ret, mode="full", benchmark=bench_ret, display=False
-        )
+        stats = qs.reports.metrics(stock_ret, mode="full", benchmark=bench_ret, display=False)
         return stats
 
     # def get_fundamental_ratios(self) -> pd.DataFrame:

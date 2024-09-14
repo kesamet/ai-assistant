@@ -40,10 +40,7 @@ class NewsAPITool(BaseTool):
         top_headlines = newsapi.get_top_headlines(q=query, sources=SOURCES)
 
         result = "\n\n".join(
-            [
-                "\n".join([n["title"], n["description"]])
-                for n in top_headlines["articles"]
-            ]
+            ["\n".join([n["title"], n["description"]]) for n in top_headlines["articles"]]
         )
         if not result:
             return f"No news found for '{query}'."

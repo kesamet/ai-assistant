@@ -17,9 +17,7 @@ class GeminiPro:
         from langchain_google_genai import ChatGoogleGenerativeAI
 
         self.model_name = model_name
-        self.llm = ChatGoogleGenerativeAI(
-            model=model_name, temperature=CFG.LLM_CONFIG.TEMPERATURE
-        )
+        self.llm = ChatGoogleGenerativeAI(model=model_name, temperature=CFG.LLM_CONFIG.TEMPERATURE)
 
     def __call__(self, messages: list[ChatMessage], *args: Any, **kwds: Any) -> dict:
         # Converts messages to Human or AI messages first before calling the API
@@ -56,9 +54,7 @@ class LocalChat:
     @staticmethod
     def _convert_langchainschema_to_dict(messages: list[ChatMessage]) -> list[dict]:
         """Converts list of chat messages in langchain.schema format to list of dict."""
-        return [
-            {"role": message.role, "content": message.content} for message in messages
-        ]
+        return [{"role": message.role, "content": message.content} for message in messages]
 
 
 class LocalChatOpenAI:
@@ -145,15 +141,11 @@ def chatbot():
         with st.chat_message("user"):
             st.markdown(user_input)
 
-        st.session_state.ch_messages.append(
-            ChatMessage(role="user", content=user_input)
-        )
+        st.session_state.ch_messages.append(ChatMessage(role="user", content=user_input))
 
         with st.chat_message("assistant"):
             with st.spinner("Thinking ..."):
                 answer = get_answer(llm, st.session_state.ch_messages)
             st.markdown(answer)
 
-        st.session_state.ch_messages.append(
-            ChatMessage(role="assistant", content=answer)
-        )
+        st.session_state.ch_messages.append(ChatMessage(role="assistant", content=answer))
