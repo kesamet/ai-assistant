@@ -6,6 +6,7 @@ from io import BytesIO
 
 import fitz
 import numpy as np
+from loguru import logger
 from PIL import Image
 
 
@@ -60,8 +61,8 @@ def sleep(timeout, retry=3):
                     value = function(*args, **kwargs)
                     if value is None:
                         return
-                except:
-                    print(f"Sleeping for {timeout} seconds")
+                except Exception:
+                    logger.info(f"Sleeping for {timeout} seconds")
                     time.sleep(timeout)
                     retries += 1
 
