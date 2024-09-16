@@ -48,9 +48,7 @@ def get_output(messages: list) -> str:
 def vision_assistant():
     set_container_width("80%")
     st.sidebar.title("Vision Assistant")
-    st.sidebar.info(
-        "Vision Assistant is powered by [LLaVA](https://llava-vl.github.io/)."
-    )
+    st.sidebar.info("Vision Assistant is powered by [LLaVA](https://llava-vl.github.io/).")
     st.sidebar.info(f"Running on {CFG.DEVICE}")
     get_http_status(API_URL)
 
@@ -101,9 +99,7 @@ def vision_assistant():
             message = {"role": "user", "content": user_input}
 
         st.session_state.llava_messages.append(message)
-        st.session_state.llava_messages = buffer_window_memory(
-            st.session_state.llava_messages
-        )
+        st.session_state.llava_messages = buffer_window_memory(st.session_state.llava_messages)
         st.session_state.chv_messages.append(HumanMessage(content=user_input))
 
         with c1.chat_message("assistant"):

@@ -4,9 +4,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import Runnable, RunnableBranch
 
 
-def condense_question_chain(
-    llm: LLM, prompt: BasePromptTemplate | None = None
-) -> Runnable:
+def condense_question_chain(llm: LLM, prompt: BasePromptTemplate | None = None) -> Runnable:
     """Builds a chain that condenses question and chat history to create a standalone question."""
     if prompt is None:
         template = (

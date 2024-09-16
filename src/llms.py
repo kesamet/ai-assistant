@@ -1,9 +1,9 @@
 import os
 from typing import Optional
 
+from langchain_core.callbacks import StreamingStdOutCallbackHandler
 from langchain_community.llms.ctransformers import CTransformers
 from langchain_community.llms.llamacpp import LlamaCpp
-from langchain.callbacks import StreamingStdOutCallbackHandler
 
 from src import CFG
 
@@ -52,9 +52,7 @@ def build_ctransformers(
     return llm
 
 
-def build_llamacpp(
-    model_path: str, config: Optional[dict] = None, debug: bool = False, **kwargs
-):
+def build_llamacpp(model_path: str, config: Optional[dict] = None, debug: bool = False, **kwargs):
     """Builds LLM using LlamaCpp."""
     if config is None:
         config = {

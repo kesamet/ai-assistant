@@ -135,9 +135,7 @@ Standalone question:"""
         retriever=retriever,
         return_source_documents=True,
         # combine_docs_chain_kwargs={"prompt": PromptTemplate.from_template(QA_TEMPLATE)},
-        condense_question_prompt=PromptTemplate.from_template(
-            condense_question_template
-        ),
+        condense_question_prompt=PromptTemplate.from_template(condense_question_template),
     )
     return retrieval_chain
 

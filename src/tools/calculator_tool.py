@@ -22,9 +22,7 @@ class CalculatorTool(BaseTool):
     args_schema: Type[BaseModel] = CalculatorInput
     llm_chain: Runnable
 
-    def _run(
-        self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
-    ) -> str:
+    def _run(self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None) -> str:
         """Use the tool."""
         return self.llm_chain.invoke({"question": query})
 

@@ -63,9 +63,7 @@ def init_messages() -> None:
 
 def get_response(user_input: str, chat_history: List[Tuple[str, str]]) -> str:
     try:
-        return agent_executor.invoke(
-            {"input": user_input, "chat_history": chat_history}
-        )["output"]
+        return agent_executor.invoke({"input": user_input, "chat_history": chat_history})["output"]
     except Exception as e:
         st.error(e)
         return ""
