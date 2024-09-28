@@ -10,11 +10,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.vectorstores.faiss import FAISS
-from langchain_google_genai import (
-    ChatGoogleGenerativeAI,
-    GoogleGenerativeAIEmbeddings,
-    GoogleGenerativeAI,
-)
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
 LLM = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.0, max_retries=2)
 EMBEDDINGS = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
