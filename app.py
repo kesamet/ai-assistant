@@ -1,7 +1,3 @@
-from dotenv import load_dotenv
-
-_ = load_dotenv()
-
 import streamlit as st
 
 from streamlit_app.agent_react import agent_react
