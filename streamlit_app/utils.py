@@ -28,8 +28,10 @@ def add_header(path: str) -> None:
 
 def get_pdf_display(pdfbytes: bytes) -> str:
     base64_pdf = base64.b64encode(pdfbytes).decode("utf-8")
-    return f"""<iframe src="data:application/pdf;base64,{base64_pdf}"
-width="100%" height="970" type="application/pdf"></iframe>"""
+    return (
+        f'<iframe src="data:application/pdf;base64,{base64_pdf}" '
+        'width="100%" height="970" type="application/pdf"></iframe>'
+    )
 
 
 def download_button(
@@ -77,9 +79,8 @@ def download_button(
 
     custom_css, button_id = _custom_button_style()
     return (
-        custom_css
-        + f"""<a download="{filename}" id="{button_id}"
-href="data:file/txt;base64,{b64}">{button_text}</a><br></br>"""
+        custom_css + f'<a download="{filename}" id="{button_id}" '
+        f'href="data:file/txt;base64,{b64}">{button_text}</a><br></br>'
     )
 
 
@@ -87,8 +88,8 @@ def logout_button(auth_domain: str) -> str:
     custom_css, button_id = _custom_button_style()
     return (
         custom_css
-        + f"""<a id="{button_id}" href="https://{auth_domain}/_oauth/logout"
-target="_self">Logout</a><br></br>"""
+        + f'<a id="{button_id}" href="https://{auth_domain}/_oauth/logout" '
+        'target="_self">Logout</a><br></br>'
     )
 
 
@@ -96,37 +97,43 @@ def _custom_button_style():
     button_uuid = str(uuid.uuid4()).replace("-", "")
     button_id = re.sub(r"\d+", "", button_uuid)
 
-    custom_css = f"""<style>
-#{button_id} {{
-    background-color: #FFFFFF;
-    color: #262730;
-    padding: 0.4em 0.74em;
-    position: relative;
-    text-decoration: none;
-    border-radius: 4px;
-    border-width: 1px;
-    border-style: solid;
-    border-color: #DDDDDD;
-    border-image: initial;
-}}
-#{button_id}:hover {{
-    border-color: #F63366;
-    color: #F63366;
-}}
-#{button_id}:active {{
-    box-shadow: none;
-    background-color: #F63366;
-    color: white;
-}}
-</style>"""
+    custom_css = f"""
+            <style>
+            #{button_id} {{
+                background-color: #FFFFFF;
+                color: #262730;
+                padding: 0.4em 0.74em;
+                position: relative;
+                text-decoration: none;
+                border-radius: 4px;
+                border-width: 1px;
+                border-style: solid;
+                border-color: #DDDDDD;
+                border-image: initial;
+            }}
+            #{button_id}:hover {{
+                border-color: #F63366;
+                color: #F63366;
+            }}
+            #{button_id}:active {{
+                box-shadow: none;
+                background-color: #F63366;
+                color: white;
+            }}
+            </style>
+        """
     return custom_css, button_id
 
 
-def set_container_width(width: str) -> None:
+def adjust_container_width(width: int = 1000) -> None:
     st.markdown(
-        f"""<style>
-.appview-container .main .block-container{{ max-width: {width}; }}
-</style>""",
+        (
+            "<style>\n"
+            ".reportview-container .main .block-container{{\n"
+            f"    max-width: {width}px;\n"
+            "}}\n"
+            "</style>"
+        ),
         unsafe_allow_html=True,
     )
 

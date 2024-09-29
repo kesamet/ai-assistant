@@ -2,21 +2,17 @@ from typing import List
 
 import fitz
 import streamlit as st
+from loguru import logger
 from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
-from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain.schema import Document, HumanMessage, AIMessage
-from langchain.schema.output_parser import StrOutputParser
-from langchain.schema.runnable import RunnablePassthrough
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.vectorstores.faiss import FAISS
-from langchain_google_genai import (
-    ChatGoogleGenerativeAI,
-    GoogleGenerativeAIEmbeddings,
-    GoogleGenerativeAI,
-)
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
-from src import logger
-
+LLM = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.0, max_retries=2)
 EMBEDDINGS = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 
 METRICS = [
@@ -37,21 +33,21 @@ METRICS = [
 
 
 @st.cache_data
-def _get_content_db(filename):
-    loader = PyMuPDFLoader(filename)
+def _get_content_db(pdf_filepath):
+    loader = PyMuPDFLoader(pdf_filepath)
     pages = loader.load_and_split()
     return FAISS.from_documents(pages, EMBEDDINGS)
 
 
 @st.cache_data
-def _get_tables_db(filename):
-    table_docs = extract_tables(filename)
+def _get_tables_db(pdf_filepath):
+    table_docs = extract_tables(pdf_filepath)
     return FAISS.from_documents(table_docs, EMBEDDINGS)
 
 
-def extract_tables(filename: str) -> List[Document]:
+def extract_tables(pdf_filepath: str) -> List[Document]:
     """Extract tables from PDF."""
-    pdf_file = fitz.open(filename)
+    pdf_file = fitz.open(pdf_filepath)
     table_docs = list()
     for page in pdf_file:
         tabs = page.find_tables()
@@ -65,7 +61,7 @@ def extract_tables(filename: str) -> List[Document]:
                     continue
                 d = Document(
                     page_content=df.to_json(),
-                    metadata={"source": filename, "page": page.number},
+                    metadata={"source": pdf_filepath, "page": page.number},
                 )
                 table_docs.append(d)
             except Exception:
@@ -73,51 +69,59 @@ def extract_tables(filename: str) -> List[Document]:
     return table_docs
 
 
-@st.cache_data
-def extract_metrics(_retriever, _tables_db):
-    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.0)
-
-    content_template = """Based only on the following context, answer the question in a sentence:
-Context: {context}
-Question: {question}"""
+def build_chain(content_retriever, tables_retriever):
+    content_template = (
+        "Based only on the following context, answer the question in a sentence:\n"
+        "Context: {context}\n"
+        "Question: {question}"
+    )
     content_chain = (
-        {"context": _retriever, "question": RunnablePassthrough()}
-        | ChatPromptTemplate.from_template(content_template)
-        | model
+        {"context": content_retriever, "question": RunnablePassthrough()}
+        | PromptTemplate.from_template(content_template)
+        | LLM
         | StrOutputParser()
     )
 
-    tables_retriever = _tables_db.as_retriever()
-
-    table_prompt = """Using the following tables, answer the question in a sentence:
-Tables: {context}
-Question: {question}"""
+    table_template = (
+        "Using the following tables, answer the question in a sentence:\n"
+        "Tables: {context}\n"
+        "Question: {question}"
+    )
     table_chain = (
         {"context": tables_retriever, "question": RunnablePassthrough()}
-        | ChatPromptTemplate.from_template(table_prompt)
-        | model
+        | PromptTemplate.from_template(table_template)
+        | LLM
         | StrOutputParser()
     )
 
-    summarise_prompt = """From the answers below, summarise the final answer \
-that contains information in a sentence:
-Answer 1: {content_answer}
-Answer 2: {table_answer}
-Final answer:"""
-
+    summarise_template = (
+        "From the answers below, summarise the final answer "
+        "that contains information in a sentence:\n"
+        "Answer 1: {content_answer}\n"
+        "Answer 2: {table_answer}\n"
+        "Final answer:"
+    )
     chain = (
         {"content_answer": content_chain, "table_answer": table_chain}
-        | ChatPromptTemplate.from_template(summarise_prompt)
-        | model
+        | PromptTemplate.from_template(summarise_template)
+        | LLM
         | StrOutputParser()
     )
+    return chain
 
+
+def extract_metrics(chain):
     results = list()
     for metric in METRICS:
         res = chain.invoke(f"What is the portfolio {metric}?")
         st.info(res)
         results.append(res)
     return results
+
+
+@st.cache_data
+def _get_metrics(_chain):
+    return extract_metrics(_chain)
 
 
 def build_retrieval_chain(retriever):
@@ -130,7 +134,7 @@ Follow Up Input: {question}
 Standalone question:"""
 
     retrieval_chain = ConversationalRetrievalChain.from_llm(
-        llm=GoogleGenerativeAI(model="gemini-pro", temperature=0.0),
+        llm=LLM,
         chain_type="stuff",
         retriever=retriever,
         return_source_documents=True,
@@ -150,23 +154,22 @@ def financial_assistant():
     st.title("Financial Assistant")
     # st.info("This app extracts predefined metrics from financial reports.")
 
-    filename = st.sidebar.text_input(
-        "Input file path", "/home/kokmeng/Desktop/reports/AA-2023Q4.pdf"
-    )
-    if filename == "":
+    pdf_filepath = st.text_input("Input PDF filepath")
+    if pdf_filepath == "":
         st.stop()
 
-    content_db = _get_content_db(filename)
+    content_db = _get_content_db(pdf_filepath)
     content_retriever = content_db.as_retriever()
+    tables_db = _get_tables_db(pdf_filepath)
+    tables_retriever = tables_db.as_retriever()
+    metrics_chain = build_chain(content_retriever, tables_retriever)
     retrieval_chain = build_retrieval_chain(content_retriever)
-
-    tables_db = _get_tables_db(filename)
 
     with st.sidebar.form("metrics"):
         st.write("Retrieve metrics")
         submitted = st.form_submit_button("Submit")
         if submitted:
-            _ = extract_metrics(content_retriever, tables_db)
+            _ = _get_metrics(metrics_chain)
 
     init_messages()
 
