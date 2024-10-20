@@ -42,13 +42,13 @@ def sleep(timeout, retry=3):
     return the_real_decorator
 
 
-def encode_image_from_uri(uri: str) -> str:
+def encode_uri_image(uri: str) -> str:
     """Get base64 encoded string from image URI."""
     with open(uri, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
 
 
-def encode_image_from_pil(image: Image.Image) -> str:
+def encode_pil_image(image: Image.Image) -> str:
     """Encode a PIL image to base64 encoded string."""
     buffered = BytesIO()
     image.save(buffered, format="png")
@@ -56,7 +56,7 @@ def encode_image_from_pil(image: Image.Image) -> str:
     return base64_bytes.decode("utf-8")
 
 
-def encode_page(page: fitz.Page) -> str:
+def encode_fitz_page(page: fitz.Page) -> str:
     """Encode a fitz page to base64 encoded string."""
     pix = page.get_pixmap()
     return base64.b64encode(pix.pil_tobytes("png")).decode("utf-8")
