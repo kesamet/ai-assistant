@@ -1,32 +1,29 @@
-from langchain.tools import Tool
-from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_community.utilities.tavily_search import TavilySearchAPIWrapper
-from langchain_community.utilities.wikipedia import WikipediaAPIWrapper
-from langchain_community.utilities.wolfram_alpha import WolframAlphaAPIWrapper
-from langchain_google_genai import GoogleGenerativeAI
+from langchain_community.tools import TavilySearchResults, WikipediaQueryRun, WolframAlphaQueryRun
+from langchain_community.utilities import WikipediaAPIWrapper, WolframAlphaAPIWrapper
+from langchain_community.utilities.polygon import PolygonAPIWrapper
+from langchain_community.agent_toolkits import PolygonToolkit
 
 from .newsapi_tool import NewsAPITool
-from .calculator_tool import CalculatorTool
-
-llm = GoogleGenerativeAI(model="gemini-pro", temperature=0.0)
 
 # Web Search Tool
-_search = TavilySearchAPIWrapper()
-description = (
-    "A search engine optimized for comprehensive, accurate, "
-    "and trusted results. Useful for when you need to answer questions "
-    "about current events or about recent information. "
-    "Input should be a search query. "
-    "If the user is asking about something that you don't know about, "
-    "you should probably use this tool to see if that can provide any information."
+tavily_tool = TavilySearchResults(
+    description=(
+        "A search engine optimized for comprehensive, accurate, "
+        "and trusted results. Useful for when you need to answer questions "
+        "about current events or about recent information. "
+        "Input should be a search query. "
+        "If the user is asking about something that cannot be found in the document, "
+        "you should probably use this tool."
+    ),
+    max_results=4,
+    include_answer=True,
+    include_raw_content=True,
+    include_images=True,
 )
-tavily_tool = TavilySearchResults(api_wrapper=_search, description=description)
 
 # Wikipedia Tool
-_wikipedia = WikipediaAPIWrapper()
-wikipedia_tool = Tool(
-    name="Wikipedia",
-    func=_wikipedia.run,
+wikipedia_tool = WikipediaQueryRun(
+    api_wrapper=WikipediaAPIWrapper(),
     description=(
         "A wrapper around Wikipedia. Useful for when you need to answer general questions about "
         "people, places, companies, facts, historical events, or other subjects. "
@@ -35,17 +32,17 @@ wikipedia_tool = Tool(
 )
 
 # Wolfram Tool
-_wolfram = WolframAlphaAPIWrapper()
-wolfram_tool = Tool(
-    name="WolframAlpha",
-    func=_wolfram.run,
+wolfram_tool = WolframAlphaQueryRun(
+    api_wrapper=WolframAlphaAPIWrapper(),
     description=(
         "A useful tool for answering complex questions about math, " "such as solving equations."
     ),
 )
 
+# Polygon Tools: PolygonAggregates, PolygonLastQuote, PolygonTickerNews, PolygonFinancials
+polygon = PolygonAPIWrapper()
+toolkit = PolygonToolkit.from_polygon_api_wrapper(polygon)
+polygon_tools = toolkit.get_tools()
+
 # NewsAPI Tool
 newsapi_tool = NewsAPITool()
-
-# Calculator Tool
-calculator_tool = CalculatorTool.from_llm(llm)
