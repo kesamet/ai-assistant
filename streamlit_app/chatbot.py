@@ -7,7 +7,7 @@ from langchain_openai import ChatOpenAI
 
 from src import CFG
 
-CHAT_MODELS = ["gemini-pro", "gpt-4-0613", "llama-2", "mistral", "llamacpp"]
+CHAT_MODELS = ["gemini", "gpt-4-0613", "llama-2", "mistral", "llamacpp"]
 
 
 class GeminiPro:
