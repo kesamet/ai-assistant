@@ -168,6 +168,6 @@ cython_debug/
 .vscode/
 
 # others
+archive/
 models/
-temp/
 dev*
